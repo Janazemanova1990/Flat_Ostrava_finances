@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f7f4;
+  --foreground: #2d3b2d;
+  --card: #ffffff;
+  --card-foreground: #2d3b2d;
+  --card-border: #d4e0d4;
+  --primary: #3d5c3d;
+  --primary-foreground: #f4f7f4;
+  --muted: #8faa8f;
+  --muted-foreground: #5f7a5f;
+  --border: #d4e0d4;
+  --input: #d4e0d4;
+  --ring: #3d5c3d;
+  --radius: 0.5rem;
+}
+
+body {
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(134,179,134,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(210,169,169,0.12) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+}
+
+.font-display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-variation-settings: "opsz" 144;
+}
