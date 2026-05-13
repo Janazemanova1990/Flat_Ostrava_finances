@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { db } from "@/db";
 import { entries, meta } from "@/db/schema";
 import { computeTotals } from "@/lib/calculations";
