@@ -6,27 +6,37 @@ This file gives Claude Code the context it needs to work on this project. Read i
 
 ## Build status
 
-**All code written and committed. Migration applied to Neon. Ready to deploy to Vercel.**
+**Deployed to Vercel. App is live at flat-ostrava-finances.vercel.app. CSS fix in flight as of last push.**
 
 ### What's done
 - Full Next.js 15 app scaffold (Tasks 1–14 of the implementation plan)
 - Auth: single-password middleware, Web Crypto HMAC cookie (`lib/auth.ts`)
-- DB: Drizzle schema + migration applied to Neon (`db/schema.ts`, `db/migrations/`)
+- DB: Drizzle schema + migration applied to Neon (`db/schema.ts`, `db/migrations/`) — both `DATABASE_URL` and `DATABASE_URL_UNPOOLED` verified connecting
 - All API routes: entries CRUD, meta, upload, export (JSON/CSV/tax-ZIP), import
 - All UI: property header, tab nav, meta editor, entry forms, invoice upload, dashboard
 - 8/8 mortgage calculator tests passing
-- `next build` succeeds
+- `next build` succeeds locally
+- Vercel project created, all 5 env vars set (Production only), auto-deploy on push working
+- Deployment bugs fixed: conflicting `app/page.tsx` removed, `force-dynamic` added to dashboard page, `vercel.json` overrides build command to `next build` (skips drizzle-kit migrate which breaks in Vercel's build env)
+- Tailwind v3 + PostCSS properly wired up (see CSS notes below)
 
-### What's next (Task 15 — deploy)
-1. Set up Vercel Blob storage → get `BLOB_READ_WRITE_TOKEN`
-2. Create Vercel project, add all 5 env vars from `.env.local`
-3. `git push` → Vercel auto-deploys
-4. Optional: add domain `flat.nextfemai.com`
+### What's next
+1. **Verify styling** — confirm the app looks correct on Vercel after the last push (commit `2eab42f`). The CSS fix was the last push.
+2. **Set up Vercel Blob** → get `BLOB_READ_WRITE_TOKEN` → add to Vercel env vars → invoice upload will work
+3. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
 
 ### Known notes
-- `DATABASE_URL_UNPOOLED` should use the **non-pooled** Neon URL (no `-pooler` in hostname) — currently both point to pooled; works for now but migrations may be slow
-- `BLOB_READ_WRITE_TOKEN` is empty — invoice upload will fail until Vercel Blob is set up
-- `drizzle.config.ts` loads `.env.local` via `dotenv` (needed because drizzle-kit doesn't auto-load it)
+- `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname) — works but migrations may be slow. Fix by getting the direct connection string from Neon console → Connection Details → Direct.
+- `BLOB_READ_WRITE_TOKEN` is not yet set — invoice upload will return an error until Vercel Blob is configured.
+- `drizzle.config.ts` loads `.env.local` via `dotenv`. Migrations must be run **locally** (`pnpm db:migrate`) — NOT during Vercel build. The `vercel.json` `buildCommand: "next build"` ensures this.
+- Do NOT add `drizzle-kit migrate` back to the build script or `vercel.json`. Run migrations manually before deploying schema changes.
+
+### CSS / Tailwind setup (hard-won — do not revert)
+- **Tailwind v3** (`tailwindcss@^3.4`) — NOT v4. shadcn/ui components were generated for v3 and are incompatible with v4.
+- **`postcss.config.js`** — must be `.js` (CommonJS `module.exports`), NOT `.mjs`. Next.js silently ignores `.mjs` PostCSS configs.
+- **`tailwind.config.ts`** — content paths + CSS variable color mappings (needed for `bg-primary`, `text-foreground`, etc.).
+- **`globals.css`** — uses `@tailwind base/components/utilities` directives. CSS variables are HSL channel values (e.g. `--primary: 120 20% 30%`) not hex, so Tailwind opacity modifiers like `bg-primary/90` work.
+- App-specific colours (Sage & Blush palette) are in `lib/colours.ts` as hex values and applied as inline styles — they do NOT go through Tailwind classes.
 
 ---
 
