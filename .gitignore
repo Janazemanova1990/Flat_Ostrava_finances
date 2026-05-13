@@ -4,3 +4,6 @@ node_modules/
 .next/
 *.db
 .DS_Store
+next-env.d.ts
+tsconfig.tsbuildinfo
+.superpowers/
