@@ -6,7 +6,7 @@ type Props = { params: MortgageParams };
 export function MortgageCard({ params }: Props) {
   if (!params.principal || !params.annualRate || !params.startDate) {
     return (
-      <div className="bg-white border border-[#d4e0d4] rounded-xl p-6 text-sm text-[#8faa8f]">
+      <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6 text-sm text-[#8faa8f]">
         Add mortgage details in property settings to see payoff progress.
       </div>
     );
@@ -29,7 +29,7 @@ export function MortgageCard({ params }: Props) {
   const moLeft = (n - monthsElapsed) % 12;
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-6">
+    <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6">
       <div className="flex justify-between items-center mb-4">
         <span className="text-xs font-bold uppercase tracking-widest text-[#2d3b2d]">Mortgage payoff</span>
         <span className="text-xs text-[#8faa8f]">

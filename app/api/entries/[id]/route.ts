@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { entries } from "@/db/schema";
+import { entries, attachments } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { del } from "@vercel/blob";
@@ -43,9 +43,12 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const [entry] = await db.select().from(entries).where(eq(entries.id, id));
   if (!entry) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  if (entry.invoiceUrl) {
-    await del(entry.invoiceUrl).catch(() => null);
-  }
+  // Delete legacy single invoice blob
+  if (entry.invoiceUrl) await del(entry.invoiceUrl).catch(() => null);
+
+  // Delete all attachment blobs (DB rows handled by ON DELETE CASCADE)
+  const entryAttachments = await db.select().from(attachments).where(eq(attachments.entryId, id));
+  await Promise.all(entryAttachments.map((a) => del(a.blobUrl).catch(() => null)));
 
   await db.delete(entries).where(eq(entries.id, id));
   return NextResponse.json({ ok: true });

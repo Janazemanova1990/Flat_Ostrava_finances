@@ -1,14 +1,15 @@
 import { EntryRow } from "@/components/entry-row";
 import { fmtCZK } from "@/lib/constants";
-import type { Entry } from "@/db/schema";
+import type { EntryWithAttachments } from "@/db/schema";
 
 type Props = {
   category: string;
-  entries: Entry[];
+  entries: EntryWithAttachments[];
   color: "sage" | "income";
+  onEdit: (entry: EntryWithAttachments) => void;
 };
 
-export function CategoryGroup({ category, entries, color }: Props) {
+export function CategoryGroup({ category, entries, color, onEdit }: Props) {
   const total = entries.reduce((s, e) => s + Number(e.amount), 0);
   const totalColor = color === "income" ? "text-[#2d6a2d]" : "text-[#2d3b2d]";
 
@@ -21,7 +22,9 @@ export function CategoryGroup({ category, entries, color }: Props) {
       <div className="divide-y divide-[#f0f5f0]">
         {entries
           .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
-          .map((e) => <EntryRow key={e.id} entry={e} color={color} />)}
+          .map((e) => (
+            <EntryRow key={e.id} entry={e} color={color} onEdit={() => onEdit(e)} />
+          ))}
       </div>
     </div>
   );

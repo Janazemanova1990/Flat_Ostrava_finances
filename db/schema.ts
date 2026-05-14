@@ -34,6 +34,18 @@ export const entries = pgTable("entries", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(sql`now()`),
 });
 
+export const attachments = pgTable("attachments", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  entryId: uuid("entry_id").notNull().references(() => entries.id, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
+  blobUrl: text("blob_url").notNull(),
+  mimeType: text("mime_type").notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().default(sql`now()`),
+});
+
 export type Meta = typeof meta.$inferSelect;
 export type Entry = typeof entries.$inferSelect;
 export type NewEntry = typeof entries.$inferInsert;
+export type Attachment = typeof attachments.$inferSelect;
+export type EntryWithAttachments = Entry & { attachments: Attachment[] };

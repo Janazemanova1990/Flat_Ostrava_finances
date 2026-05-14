@@ -6,30 +6,40 @@ This file gives Claude Code the context it needs to work on this project. Read i
 
 ## Build status
 
-**Deployed to Vercel. App is live at flat-ostrava-finances.vercel.app. CSS fix in flight as of last push.**
+**App is live at flat-ostrava-finances.vercel.app. Pending push: mobile layout fixes + edit entries + attachments.**
 
 ### What's done
-- Full Next.js 15 app scaffold (Tasks 1–14 of the implementation plan)
+- Full Next.js 15 app scaffold with all pages, API routes, and dashboard
 - Auth: single-password middleware, Web Crypto HMAC cookie (`lib/auth.ts`)
-- DB: Drizzle schema + migration applied to Neon (`db/schema.ts`, `db/migrations/`) — both `DATABASE_URL` and `DATABASE_URL_UNPOOLED` verified connecting
-- All API routes: entries CRUD, meta, upload, export (JSON/CSV/tax-ZIP), import
-- All UI: property header, tab nav, meta editor, entry forms, invoice upload, dashboard
+- DB: Drizzle schema + migrations applied to Neon. Two migrations exist:
+  - `0000_opposite_killraven` — initial schema (entries, meta)
+  - `0001_add_attachments` — attachments table (applied manually via Node script, see migration notes below)
+- All API routes: entries CRUD, meta, upload, export (JSON/CSV/tax-ZIP), import, attachments, blob-download proxy
+- All UI: property header, tab nav, meta editor, entry forms, dashboard, entry edit, file attachments
 - 8/8 mortgage calculator tests passing
-- `next build` succeeds locally
-- Vercel project created, all 5 env vars set (Production only), auto-deploy on push working
-- Deployment bugs fixed: conflicting `app/page.tsx` removed, `force-dynamic` added to dashboard page, `vercel.json` overrides build command to `next build` (skips drizzle-kit migrate which breaks in Vercel's build env)
 - Tailwind v3 + PostCSS properly wired up (see CSS notes below)
+- Mobile layout fixed for 375–430px viewports (iPhone SE → iPhone 16 Pro)
+- Tab nav: icon-only on mobile (`hidden sm:inline` labels), full labels on desktop
+- **Entry editing:** pencil icon on each row opens pre-filled form, saves via PATCH
+- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private), displayed as chips with per-file delete. Blobs served via `/api/blob-download` proxy (token never exposed to browser)
+- **Notes field:** textarea with placeholder, saves correctly end-to-end
 
 ### What's next
-1. **Verify styling** — confirm the app looks correct on Vercel after the last push (commit `2eab42f`). The CSS fix was the last push.
-2. **Set up Vercel Blob** → get `BLOB_READ_WRITE_TOKEN` → add to Vercel env vars → invoice upload will work
-3. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
+1. **Test in production** — verify attachments, edit, and notes work on Vercel after this push
+2. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
 
 ### Known notes
-- `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname) — works but migrations may be slow. Fix by getting the direct connection string from Neon console → Connection Details → Direct.
-- `BLOB_READ_WRITE_TOKEN` is not yet set — invoice upload will return an error until Vercel Blob is configured.
-- `drizzle.config.ts` loads `.env.local` via `dotenv`. Migrations must be run **locally** (`pnpm db:migrate`) — NOT during Vercel build. The `vercel.json` `buildCommand: "next build"` ensures this.
+- `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname). `drizzle-kit migrate` uses this connection and may silently fail if it points to a different endpoint than the app. **Safe migration method:** use the Node script pattern that uses `DATABASE_URL` directly (see migration history below).
+- `BLOB_READ_WRITE_TOKEN` is set in both `.env.local` and Vercel dashboard. The Blob store is **private access** — all files use `access: "private"` in `put()`. Downloads go through `/api/blob-download?url=...` which fetches with the server token.
+- `drizzle.config.ts` loads `.env.local` via `dotenv`. Migrations must be run **locally** — NOT during Vercel build. The `vercel.json` `buildCommand: "next build"` ensures this.
 - Do NOT add `drizzle-kit migrate` back to the build script or `vercel.json`. Run migrations manually before deploying schema changes.
+- **When adding a new migration:** `pnpm db:migrate` may not apply it if `DATABASE_URL_UNPOOLED` is wrong. Fallback: apply SQL directly via Node — `node -e "require('dotenv').config({path:'.env.local'}); const {neon}=require('@neondatabase/serverless'); neon(process.env.DATABASE_URL)\`YOUR SQL\`.then(()=>console.log('done'))"`.
+
+### Migration history
+| File | Applied | Method |
+|---|---|---|
+| `0000_opposite_killraven.sql` | ✓ | `pnpm db:migrate` |
+| `0001_add_attachments.sql` | ✓ | Node script via `DATABASE_URL` (drizzle-kit used wrong endpoint) |
 
 ### CSS / Tailwind setup (hard-won — do not revert)
 - **Tailwind v3** (`tailwindcss@^3.4`) — NOT v4. shadcn/ui components were generated for v3 and are incompatible with v4.
@@ -71,49 +81,57 @@ A personal web app for Jana to track all finances related to her Ostrava flat pu
 ```
 /app
   /api
-    /entries/route.ts       # GET, POST entries
-    /entries/[id]/route.ts  # DELETE, PATCH entry
-    /meta/route.ts          # GET, PATCH property meta
-    /upload/route.ts        # POST (Vercel Blob upload), DELETE (remove blob)
-    /export/route.ts        # GET → JSON/CSV/tax ZIP download
-    /import/route.ts        # POST → restore from JSON
-  /login/page.tsx           # Password entry
+    /entries/route.ts           # GET, POST entries
+    /entries/[id]/route.ts      # DELETE (cleans all blobs), PATCH entry
+    /meta/route.ts              # GET, PATCH property meta
+    /upload/route.ts            # POST (Vercel Blob, private), DELETE — single invoice upload
+    /attachments/route.ts       # POST — upload file to Blob + insert attachments row
+    /attachments/[id]/route.ts  # DELETE — remove blob + DB row
+    /blob-download/route.ts     # GET ?url= — proxy for private blobs (serves with auth token)
+    /export/route.ts            # GET → JSON/CSV/tax ZIP download
+    /import/route.ts            # POST → restore from JSON
+  /login/page.tsx               # Password entry
   /(app)
-    /layout.tsx             # Auth-protected layout, property header
-    /page.tsx               # Dashboard (default tab)
-    /purchase/page.tsx
+    /layout.tsx                 # Auth-protected layout, property header
+    /page.tsx                   # Dashboard (default tab)
+    /purchase/page.tsx          # Fetches entries + attachments, passes EntryWithAttachments[]
     /expenses/page.tsx
     /income/page.tsx
   /globals.css
-  /layout.tsx               # Root layout (fonts, metadata)
+  /layout.tsx                   # Root layout (fonts, metadata)
 /components
-  /ui/*                     # shadcn/ui primitives
-  /entry-section.tsx        # Shared list+form for purchase/expenses/income
-  /invoice-upload.tsx       # Dashed drop zone + file preview, calls /api/upload
+  /ui/*                         # shadcn/ui primitives
+  /entry-section.tsx            # List + add/edit form, manages editingEntry state
+  /entry-form.tsx               # Add or edit entry (entry? prop = edit mode), multi-file upload
+  /entry-row.tsx                # Row with pencil+trash icons, attachment chips
+  /category-group.tsx           # Groups rows by category, passes onEdit through
+  /invoice-upload.tsx           # Single invoice drop zone (legacy), links via /api/blob-download
   /meta-editor.tsx
-  /property-header.tsx      # Global header: name, chips, edit button, export buttons
+  /property-header.tsx          # Global header: name, chips, edit button, export buttons
   /dashboard
-    /kpi-cards.tsx
-    /mini-stats.tsx
+    /dashboard.tsx
+    /kpi-card.tsx
+    /mini-stat.tsx
     /financing-breakdown.tsx
-    /mortgage-card.tsx      # Dark property section + lavender interest section
+    /mortgage-card.tsx          # Dark property section + lavender interest section
     /property-value-card.tsx
     /recent-activity.tsx
-    /rate-banner.tsx        # Amber banner, shown ≤60 days before rate reset
+    /rate-notification.tsx      # Amber banner, shown ≤60 days before rate reset
 /db
-  /schema.ts                # Drizzle schema
-  /index.ts                 # Drizzle client
-  /migrations/              # Generated migrations
+  /schema.ts                    # Drizzle schema — entries, meta, attachments tables + types
+  /index.ts                     # Drizzle client (neon-http)
+  /migrations/                  # SQL migration files
 /lib
-  /constants.ts             # Categories, CZK formatter
-  /colours.ts               # Sage & Blush colour token object (not Tailwind classes)
-  /auth.ts                  # Password check helper
-  /mortgage.ts              # Amortisation pure functions + Vitest tests
-  /calculations.ts          # Yield, totals, pricePerM2, appreciation, daysUntilRateReset
-/middleware.ts              # Password gate
+  /constants.ts                 # Categories, CZK formatter, todayISO
+  /colours.ts                   # Sage & Blush colour token object (not Tailwind classes)
+  /auth.ts                      # Password check helper
+  /mortgage.ts                  # Amortisation pure functions + Vitest tests
+  /calculations.ts              # Yield, totals, pricePerM2, appreciation, daysUntilRateReset
+/middleware.ts                  # Password gate
 /drizzle.config.ts
-/.env.local                 # NEVER commit
-/.env.example               # Commit this
+/reference/flat_finance_tracker.jsx  # Original prototype — reference only, not imported
+/.env.local                     # NEVER commit
+/.env.example                   # Commit this
 ```
 
 ---
@@ -268,7 +286,7 @@ Body: partial Entry.
 Returns `{ entry: Entry }`.
 
 ### `DELETE /api/entries/[id]`
-Returns `{ ok: true }`. Also deletes associated Vercel Blob file if `invoice_url` is set.
+Returns `{ ok: true }`. Deletes legacy `invoice_url` blob, then fetches and deletes all attachment blobs, then deletes the entry (DB cascade removes attachment rows).
 
 ### `GET /api/meta`
 Returns `{ meta: Meta }`.
@@ -292,6 +310,18 @@ Returns ZIP: `flat-tax-export-{year}.zip` containing `entries.csv` + `invoices/`
 
 ### `POST /api/import`
 Body: JSON backup file content. Replaces all data. Returns `{ ok: true, imported: { purchase, ongoing, income } }`.
+
+### `POST /api/attachments`
+Body: `multipart/form-data` with `file` and `entryId` fields. Uploads to Vercel Blob (private), inserts row in `attachments` table.
+Returns `{ attachment: Attachment }`.
+
+### `DELETE /api/attachments/[id]`
+Deletes blob from Vercel Blob and removes DB row.
+Returns `{ ok: true }`.
+
+### `GET /api/blob-download?url=<encoded-blob-url>`
+Server-side proxy for private Vercel Blob files. Fetches with `BLOB_READ_WRITE_TOKEN` and streams to client.
+Use this for all `href` links to blob files — never link to blob URLs directly.
 
 ---
 
@@ -343,7 +373,7 @@ Commit `.env.example` with placeholders. Never commit real values.
 - CZK only.
 - No user accounts table.
 - Palette is Sage & Blush (custom hex values, not Tailwind colours) — do not revert to stone/purple prototype palette.
-- Invoice attachment in v1, not deferred — affects DB schema (`invoice_url`, `invoice_filename` on entries table).
+- Invoice attachment in v1 — `invoice_url`/`invoice_filename` on entries table (legacy single-file). New multi-file system uses the `attachments` table (FK → entries, ON DELETE CASCADE). Both coexist; new entries use `attachments`, old entries with `invoice_url` still display correctly via the blob-download proxy.
 - Tax-deductible is a boolean flag per entry, not a category or free-form tag.
 - Property appreciation is manual estimate only — Jana updates from Sreality.cz when she wants.
 - Mortgage amortisation is auto-calculated from stored params in `meta` table — user does not manually enter monthly split.

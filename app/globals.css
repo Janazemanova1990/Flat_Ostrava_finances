@@ -26,6 +26,11 @@
   --radius: 0.5rem;
 }
 
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 body {
   background-color: #f4f7f4;
   background-image:

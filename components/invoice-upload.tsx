@@ -19,8 +19,8 @@ export function InvoiceUpload({ value, onChange }: Props) {
     const res = await fetch("/api/upload", { method: "POST", body: form });
     setUploading(false);
     if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? "Upload failed");
+      const data = await res.json().catch(() => ({}));
+      setError((data as { error?: string }).error ?? "Upload failed");
       return;
     }
     const { url, filename } = await res.json();
@@ -42,7 +42,7 @@ export function InvoiceUpload({ value, onChange }: Props) {
       <div className="flex items-center gap-3 bg-white border border-[#d4e0d4] rounded-lg px-3 py-2.5">
         <FileText size={16} className="text-[#3d5c3d] flex-shrink-0" />
         <div className="flex-1 min-w-0">
-          <a href={value.url} target="_blank" rel="noopener noreferrer"
+          <a href={`/api/blob-download?url=${encodeURIComponent(value.url)}`} target="_blank" rel="noopener noreferrer"
             className="text-sm font-medium text-[#2d3b2d] hover:text-[#3d5c3d] truncate block">
             {value.filename}
           </a>

@@ -17,7 +17,7 @@ async function getMeta() {
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const metaRow = await getMeta();
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
+    <div className="w-full overflow-x-hidden max-w-6xl mx-auto px-4 sm:px-6 py-10">
       <PropertyHeader meta={metaRow} />
       <TabNav />
       <main>{children}</main>

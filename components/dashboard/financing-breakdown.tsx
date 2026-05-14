@@ -8,7 +8,7 @@ export function FinancingBreakdown({ purchasePrice, mortgageAmount, equityInvest
   const equityPct = Math.min(100 - mortgagePct, ((purchasePrice - mortgageAmount) / purchasePrice) * 100);
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-6">
+    <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6">
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-1">Financing breakdown</div>
