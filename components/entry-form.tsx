@@ -52,7 +52,7 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
           category: categories[0],
           description: "",
           amount: "",
-          recurring: false,
+          recurring: categories[0] === "Rent",
           taxDeductible: false,
           notes: "",
           invoiceUrl: null,
@@ -169,7 +169,7 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
           <select
             className={inputClass}
             value={draft.category}
-            onChange={(e) => setDraft({ ...draft, category: e.target.value })}
+            onChange={(e) => setDraft({ ...draft, category: e.target.value, recurring: e.target.value === "Rent" ? true : draft.recurring })}
           >
             {categories.map((c) => (
               <option key={c} value={c}>{c}</option>

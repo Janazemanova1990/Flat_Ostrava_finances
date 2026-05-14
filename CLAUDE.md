@@ -252,14 +252,13 @@ If Jana wants to add or rename categories, do it in `constants.ts` only.
 
 All derived values live in `/lib/calculations.ts`. The dashboard reads from these — never recompute in components.
 
-- **Total invested** = `purchaseTotal + ongoingTotal - incomeTotal`
+- **Property equity** = `purchasePrice − mortgageAmount` (shown as top-left KPI; hidden if purchasePrice is 0)
 - **Monthly recurring expenses** = sum of `ongoing.amount` where `recurring = true`
 - **Monthly recurring income** = sum of `income.amount` where `recurring = true`
 - **Net monthly cash flow** = monthlyIncome − monthlyExpenses
 - **Annual net** = netMonthly × 12
 - **Gross yield %** = (monthlyIncome × 12 / purchasePrice) × 100
 - **Net yield %** = (annualNet / purchasePrice) × 100
-- **Equity invested** = `purchaseTotal − mortgageAmount + ongoingTotal − incomeTotal` (floor at 0 for display)
 - **Price per m²** = `purchasePrice / sizeM2` (0 if sizeM2 = 0)
 - **Appreciation (Kč)** = `currentPropertyValue − purchasePrice`
 - **Appreciation (%)** = `appreciationCZK / purchasePrice × 100`

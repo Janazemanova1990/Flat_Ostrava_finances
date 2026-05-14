@@ -29,7 +29,7 @@ export function Dashboard({ totals, meta, entries }: Props) {
     mortgageRateFixedUntil: meta.mortgageRateFixedUntil ?? undefined,
   };
 
-  const equityInvested = totals.purchaseTotal - Number(meta.mortgageAmount) + totals.ongoingTotal - totals.incomeTotal;
+  const purchasePrice = Number(meta.purchasePrice);
 
   return (
     <div className="space-y-6">
@@ -43,13 +43,20 @@ export function Dashboard({ totals, meta, entries }: Props) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <KpiCard label="Total invested" value={fmtCZK(totals.totalInvested)}
-          sublabel="Purchase + expenses − income" icon={PiggyBank} />
+        {purchasePrice > 0 ? (
+          <KpiCard label="Property equity" value={fmtCZK(totals.propertyEquity)}
+            sublabel="Your ownership in the property (price − mortgage)" icon={PiggyBank} />
+        ) : (
+          <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6 flex flex-col justify-center">
+            <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-2">Property equity</div>
+            <p className="text-sm text-[#8faa8f]">Set property details to see equity</p>
+          </div>
+        )}
         <KpiCard label="Net monthly cash flow" value={fmtCZK(totals.netMonthly)}
           sublabel={`${fmtCZK(totals.monthlyIncome)} rent − ${fmtCZK(totals.monthlyOngoing)} costs`}
           icon={Wallet} valueColor={totals.netMonthly >= 0 ? "#2d6a2d" : "#8b4a4a"} />
         <KpiCard label="Net yield" value={`${totals.netYield.toFixed(2)} %`}
-          sublabel={`Gross: ${totals.grossYield.toFixed(2)} %`} icon={Percent} />
+          sublabel={`Gross ${totals.grossYield.toFixed(2)} % · annual return on purchase price`} icon={Percent} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -59,9 +66,8 @@ export function Dashboard({ totals, meta, entries }: Props) {
       </div>
 
       <FinancingBreakdown
-        purchasePrice={Number(meta.purchasePrice)}
+        purchasePrice={purchasePrice}
         mortgageAmount={Number(meta.mortgageAmount)}
-        equityInvested={equityInvested}
       />
 
       <MortgageCard params={mortgageParams} />

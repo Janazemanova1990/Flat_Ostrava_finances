@@ -8,7 +8,7 @@ export type Totals = {
   monthlyIncome: number;
   netMonthly: number;
   annualNet: number;
-  totalInvested: number;
+  propertyEquity: number;
   grossYield: number;
   netYield: number;
   pricePerM2: number;
@@ -32,9 +32,9 @@ export function computeTotals(entries: Entry[], meta: Meta): Totals {
 
   const netMonthly = monthlyIncome - monthlyOngoing;
   const annualNet = netMonthly * 12;
-  const totalInvested = purchaseTotal + ongoingTotal - incomeTotal;
 
   const purchasePrice = Number(meta.purchasePrice);
+  const propertyEquity = purchasePrice - Number(meta.mortgageAmount);
   const grossYield = purchasePrice ? (monthlyIncome * 12 / purchasePrice) * 100 : 0;
   const netYield = purchasePrice ? (annualNet / purchasePrice) * 100 : 0;
 
@@ -49,7 +49,7 @@ export function computeTotals(entries: Entry[], meta: Meta): Totals {
   return {
     purchaseTotal, ongoingTotal, incomeTotal,
     monthlyOngoing, monthlyIncome, netMonthly, annualNet,
-    totalInvested, grossYield, netYield,
+    propertyEquity, grossYield, netYield,
     pricePerM2, appreciationCZK, appreciationPct,
   };
 }

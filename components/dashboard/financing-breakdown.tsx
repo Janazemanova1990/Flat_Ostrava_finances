@@ -1,22 +1,17 @@
 import { fmtCZK } from "@/lib/constants";
 
-type Props = { purchasePrice: number; mortgageAmount: number; equityInvested: number };
+type Props = { purchasePrice: number; mortgageAmount: number };
 
-export function FinancingBreakdown({ purchasePrice, mortgageAmount, equityInvested }: Props) {
+export function FinancingBreakdown({ purchasePrice, mortgageAmount }: Props) {
   if (purchasePrice <= 0) return null;
   const mortgagePct = Math.min(100, (mortgageAmount / purchasePrice) * 100);
   const equityPct = Math.min(100 - mortgagePct, ((purchasePrice - mortgageAmount) / purchasePrice) * 100);
 
   return (
     <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-1">Financing breakdown</div>
-          <div className="font-display text-2xl text-[#2d3b2d]">{fmtCZK(purchasePrice)}</div>
-        </div>
-        <div className="text-right text-xs text-[#8faa8f]">
-          Equity invested: <span className="text-[#2d3b2d] font-medium">{fmtCZK(Math.max(0, equityInvested))}</span>
-        </div>
+      <div className="mb-3">
+        <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-1">Financing breakdown</div>
+        <div className="font-display text-2xl text-[#2d3b2d]">{fmtCZK(purchasePrice)}</div>
       </div>
       <div className="h-3 bg-[#e8f0e8] rounded-full overflow-hidden flex">
         <div className="bg-[#1c1917] h-full rounded-full" style={{ width: `${mortgagePct}%` }} title="Mortgage" />
