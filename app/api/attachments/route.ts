@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const mimeType = file.type || "application/octet-stream";
 
   const blob = await put(`attachments/${entryId}/${Date.now()}-${file.name}`, file, {
-    access: "private",
+    access: "private" as "public",
     contentType: mimeType,
   });
 

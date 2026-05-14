@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   }
 
   const blob = await put(`invoices/${Date.now()}-${file.name}`, file, {
-    access: "private",
+    access: "private" as "public",
     contentType: file.type,
   });
 
