@@ -13,7 +13,7 @@ export default async function DashboardPage() {
 
   const metaData = metaRow ?? {
     id: 1,
-    propertyName: "Ostrava — Nádražní 2965/9",
+    propertyName: "Ostrava - Nádražní 2965/9",
     purchasePrice: "0",
     mortgageAmount: "0",
     targetMonthlyRent: "0",

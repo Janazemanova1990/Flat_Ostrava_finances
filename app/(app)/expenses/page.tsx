@@ -23,7 +23,7 @@ export default async function ExpensesPage() {
   return (
     <EntrySection
       title="Ongoing expenses"
-      subtitle="Monthly and ad-hoc costs — mortgage, SVJ, utilities, repairs. Flag the recurring ones and mark tax-deductible entries for your accountant."
+      subtitle="Monthly and ad-hoc costs - mortgage, SVJ, utilities, repairs. Flag the recurring ones and mark tax-deductible entries for your accountant."
       section="ongoing"
       entries={entriesWithAttachments}
       color="sage"

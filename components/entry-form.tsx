@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Check, CalendarClock, Paperclip, FileText, X } from "lucide-react";
 import { InvoiceUpload } from "@/components/invoice-upload";
 import { CATEGORIES, todayISO, type Section } from "@/lib/constants";
-import type { Entry } from "@/db/schema";
+import type { Entry, EntryWithAttachments } from "@/db/schema";
 
 type PendingFile = {
   file: File;
@@ -25,7 +25,7 @@ type Draft = {
 
 type Props = {
   section: Section;
-  entry?: Entry;
+  entry?: EntryWithAttachments;
   onSave: () => void;
   onCancel: () => void;
 };
@@ -60,10 +60,16 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
         }
   );
 
+  const [existingAttachments, setExistingAttachments] = useState(entry?.attachments ?? []);
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
   const [fileError, setFileError] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  async function handleDeleteAttachment(id: string) {
+    await fetch(`/api/attachments/${id}`, { method: "DELETE" });
+    setExistingAttachments((prev) => prev.filter((a) => a.id !== id));
+  }
 
   const showRecurring = section !== "purchase";
   const showTax = section !== "purchase";
@@ -259,8 +265,37 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
         />
       </div>
 
+      {existingAttachments.length > 0 && (
+        <div className="mb-3">
+          <label className={labelClass}>Attached files</label>
+          <div className="space-y-1">
+            {existingAttachments.map((a) => (
+              <div key={a.id} className="flex items-center gap-2 text-xs bg-[#f4f7f4] rounded-lg px-3 py-1.5">
+                <FileText size={12} className="text-[#3d5c3d] flex-shrink-0" />
+                <a
+                  href={`/api/blob-download?url=${encodeURIComponent(a.blobUrl)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 truncate text-[#2d3b2d] hover:underline"
+                >
+                  {a.filename}
+                </a>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteAttachment(a.id)}
+                  className="text-[#8faa8f] hover:text-[#8b4a4a]"
+                  title="Remove"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-4">
-        <label className={labelClass}>Additional files</label>
+        <label className={labelClass}>Add more files</label>
         <label
           className={`flex items-center gap-3 border-2 border-dashed border-[#b8d0b8] rounded-lg px-3 py-2.5 cursor-pointer hover:border-[#3d5c3d] hover:bg-[#edf3ed] transition`}
         >
@@ -269,7 +304,7 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm text-[#2d3b2d]">Attach more files</div>
-            <div className="text-xs text-[#8faa8f]">PDF, JPG, PNG, HEIC — max 10 MB each</div>
+            <div className="text-xs text-[#8faa8f]">PDF, JPG, PNG, HEIC - max 10 MB each</div>
           </div>
           <input
             type="file"

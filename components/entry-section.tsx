@@ -37,26 +37,26 @@ export function EntrySection({ title, subtitle, section, entries, color }: Props
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="font-display text-3xl font-medium text-[#2d3b2d] mb-1">{title}</h2>
-          <p className="text-sm text-[#5f7a5f] max-w-xl">{subtitle}</p>
-        </div>
-        <div className="text-right">
-          <div className="text-xs uppercase tracking-widest text-[#8faa8f]">Total</div>
-          <div className={`font-display text-2xl font-medium tabular-nums ${totalColor}`}>
-            {fmtCZK(total)}
-          </div>
-        </div>
+      <div>
+        <h2 className="font-display text-3xl font-medium text-[#2d3b2d] mb-1">{title}</h2>
+        <p className="text-sm text-[#5f7a5f]">{subtitle}</p>
       </div>
 
       {!editingEntry && (
-        <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="flex items-center gap-1.5 bg-[#3d5c3d] text-[#f4f7f4] px-4 py-2 rounded-lg text-sm font-medium"
-        >
-          <Plus size={14} /> Add entry
-        </button>
+        <div className="flex items-end justify-between gap-4">
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="flex items-center gap-1.5 bg-[#3d5c3d] text-[#f4f7f4] px-4 py-2 rounded-lg text-sm font-medium"
+          >
+            <Plus size={14} /> Add entry
+          </button>
+          <div className="text-right">
+            <div className="text-xs uppercase tracking-widest text-[#8faa8f]">Total</div>
+            <div className={`font-display text-2xl font-medium tabular-nums ${totalColor}`}>
+              {fmtCZK(total)}
+            </div>
+          </div>
+        </div>
       )}
 
       {showAddForm && !editingEntry && (

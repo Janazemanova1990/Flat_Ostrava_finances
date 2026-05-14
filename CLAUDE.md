@@ -21,8 +21,9 @@ This file gives Claude Code the context it needs to work on this project. Read i
 - Mobile layout fixed for 375–430px viewports (iPhone SE → iPhone 16 Pro) — no left-side clipping on iOS Safari
 - Tab nav: icon-only on mobile (`hidden sm:inline` labels), full labels on desktop
 - **Entry editing:** pencil icon on each row opens pre-filled form, saves via PATCH
-- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private), displayed as chips with per-file delete. Blobs served via `/api/blob-download` proxy (token never exposed to browser). Verified working end-to-end locally.
+- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private). Edit form shows existing attachments with individual delete buttons. Blobs served via `/api/blob-download` proxy (token never exposed to browser). Verified working end-to-end locally.
 - **Notes field:** textarea with placeholder, saves correctly end-to-end
+- **UI polish (2026-05-14):** fonts changed to DM Serif Display (headings) + DM Sans (body); dashboard KPIs merged into one two-section card; entry rows redesigned (recurring = violet ↻ amount, tap-to-expand accordion with notes + file links, tax/attachment info on date line); property header tightened (chips + edit on one row, no redundant down payment pill); export buttons moved to footer; em dashes replaced with hyphens throughout UI; property name in DB updated to use hyphen.
 
 ### What's next
 1. **Test in production** — smoke-test attachments and edit on Vercel after push

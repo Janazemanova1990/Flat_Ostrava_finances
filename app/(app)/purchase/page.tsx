@@ -23,7 +23,7 @@ export default async function PurchasePage() {
   return (
     <EntrySection
       title="Purchase costs"
-      subtitle="One-off costs to acquire the property — escrow, fees, mortgage drawdown, renovation."
+      subtitle="One-off costs to acquire the property - escrow, fees, mortgage drawdown, renovation."
       section="purchase"
       entries={entriesWithAttachments}
       color="sage"

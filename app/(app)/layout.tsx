@@ -21,8 +21,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <PropertyHeader meta={metaRow} />
       <TabNav />
       <main>{children}</main>
-      <footer className="mt-16 pt-6 border-t border-[#d4e0d4] text-xs text-[#8faa8f] text-center">
-        Data saved automatically · all amounts in CZK
+      <footer className="mt-16 pt-6 border-t border-[#d4e0d4] flex gap-2">
+        <a href="/api/export?format=json" className="flex items-center gap-1.5 bg-white border border-[#d4e0d4] text-[#5f7a5f] text-xs font-medium px-3 py-1.5 rounded-lg hover:border-[#3d5c3d]">
+          ↓ Backup JSON
+        </a>
+        <a href="/api/export?format=csv" className="flex items-center gap-1.5 bg-white border border-[#d4e0d4] text-[#5f7a5f] text-xs font-medium px-3 py-1.5 rounded-lg hover:border-[#3d5c3d]">
+          ↓ CSV
+        </a>
       </footer>
     </div>
   );

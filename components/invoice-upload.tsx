@@ -63,7 +63,7 @@ export function InvoiceUpload({ value, onChange }: Props) {
         <div className="text-sm font-medium text-[#2d3b2d]">
           {uploading ? "Uploading…" : "Attach invoice or receipt"}
         </div>
-        <div className="text-xs text-[#8faa8f]">PDF, JPG, PNG — max 10 MB</div>
+        <div className="text-xs text-[#8faa8f]">PDF, JPG, PNG - max 10 MB</div>
       </div>
       <span className="bg-white border border-[#d4e0d4] text-[#3d5c3d] text-xs font-semibold px-3 py-1 rounded-md">
         Browse

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { DM_Sans, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
-const fraunces = Fraunces({
+const dmSerifDisplay = DM_Serif_Display({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-fraunces",
-  axes: ["opsz"],
 });
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs">
-      <body className={`${inter.variable} ${fraunces.variable}`}>{children}</body>
+      <body className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>{children}</body>
     </html>
   );
 }

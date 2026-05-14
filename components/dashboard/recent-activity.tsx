@@ -11,7 +11,7 @@ export function RecentActivity({ entries }: { entries: Entry[] }) {
       <h3 className="font-display text-xl text-[#2d3b2d] mb-4">Recent activity</h3>
       {recent.length === 0 ? (
         <p className="text-sm text-[#8faa8f] py-8 text-center">
-          No transactions yet — start by adding a purchase cost or expense.
+          No transactions yet - start by adding a purchase cost or expense.
         </p>
       ) : (
         <div className="divide-y divide-[#f0f5f0]">

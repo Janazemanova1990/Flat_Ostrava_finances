@@ -42,27 +42,72 @@ export function Dashboard({ totals, meta, entries }: Props) {
         />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {purchasePrice > 0 ? (
-          <KpiCard label="Property equity" value={fmtCZK(totals.propertyEquity)}
-            sublabel="Your ownership in the property (price − mortgage)" icon={PiggyBank} />
-        ) : (
-          <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6 flex flex-col justify-center">
-            <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-2">Property equity</div>
-            <p className="text-sm text-[#8faa8f]">Set property details to see equity</p>
+      <div className="bg-white border border-[#d4e0d4] rounded-xl overflow-hidden">
+        {/* KPI section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#d4e0d4]">
+          {purchasePrice > 0 ? (
+            <div className="p-5 sm:p-6">
+              <div className="flex items-start justify-between mb-3">
+                <div className="text-xs uppercase tracking-widest text-[#8faa8f]">Property equity</div>
+                <PiggyBank size={15} className="text-[#8faa8f]" />
+              </div>
+              <div className="font-display text-3xl font-medium tabular-nums text-[#2d3b2d]">{fmtCZK(totals.propertyEquity)}</div>
+              <div className="text-xs text-[#8faa8f] mt-2">Your ownership in the property (price - mortgage)</div>
+            </div>
+          ) : (
+            <div className="p-5 sm:p-6 flex flex-col justify-center">
+              <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-2">Property equity</div>
+              <p className="text-sm text-[#8faa8f]">Set property details to see equity</p>
+            </div>
+          )}
+          <div className="p-5 sm:p-6">
+            <div className="flex items-start justify-between mb-3">
+              <div className="text-xs uppercase tracking-widest text-[#8faa8f]">Net monthly cash flow</div>
+              <Wallet size={15} className="text-[#8faa8f]" />
+            </div>
+            <div className="font-display text-3xl font-medium tabular-nums" style={{ color: totals.netMonthly >= 0 ? "#2d6a2d" : "#8b4a4a" }}>{fmtCZK(totals.netMonthly)}</div>
+            <div className="text-xs text-[#8faa8f] mt-2">Monthly rent - monthly costs</div>
           </div>
-        )}
-        <KpiCard label="Net monthly cash flow" value={fmtCZK(totals.netMonthly)}
-          sublabel={`${fmtCZK(totals.monthlyIncome)} rent − ${fmtCZK(totals.monthlyOngoing)} costs`}
-          icon={Wallet} valueColor={totals.netMonthly >= 0 ? "#2d6a2d" : "#8b4a4a"} />
-        <KpiCard label="Net yield" value={`${totals.netYield.toFixed(2)} %`}
-          sublabel={`Gross ${totals.grossYield.toFixed(2)} % · annual return on purchase price`} icon={Percent} />
-      </div>
+          <div className="p-5 sm:p-6">
+            <div className="flex items-start justify-between mb-3">
+              <div className="text-xs uppercase tracking-widest text-[#8faa8f]">Net yield</div>
+              <Percent size={15} className="text-[#8faa8f]" />
+            </div>
+            <div className="font-display text-3xl font-medium tabular-nums text-[#2d3b2d]">{totals.netYield.toFixed(2)} %</div>
+            <div className="text-xs text-[#8faa8f] mt-2">Gross {totals.grossYield.toFixed(2)} % · annual return on purchase price</div>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <MiniStat label="Purchase costs" value={fmtCZK(totals.purchaseTotal)} icon={KeyRound} />
-        <MiniStat label="Expenses to date" value={fmtCZK(totals.ongoingTotal)} icon={ArrowUpCircle} />
-        <MiniStat label="Income received" value={fmtCZK(totals.incomeTotal)} icon={ArrowDownCircle} valueColor="#2d6a2d" />
+        {/* Totals section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-[#d4e0d4] border-t border-[#d4e0d4] bg-[#f4f7f4]">
+          <div className="p-4 sm:p-5 flex items-center gap-3">
+            <div className="p-2 bg-white rounded-lg border border-[#d4e0d4]">
+              <KeyRound size={14} className="text-[#8faa8f]" />
+            </div>
+            <div>
+              <div className="text-xs text-[#8faa8f]">Purchase costs</div>
+              <div className="font-medium tabular-nums text-sm text-[#2d3b2d]">{fmtCZK(totals.purchaseTotal)}</div>
+            </div>
+          </div>
+          <div className="p-4 sm:p-5 flex items-center gap-3">
+            <div className="p-2 bg-white rounded-lg border border-[#d4e0d4]">
+              <ArrowUpCircle size={14} className="text-[#8faa8f]" />
+            </div>
+            <div>
+              <div className="text-xs text-[#8faa8f]">Expenses to date</div>
+              <div className="font-medium tabular-nums text-sm text-[#2d3b2d]">{fmtCZK(totals.ongoingTotal)}</div>
+            </div>
+          </div>
+          <div className="p-4 sm:p-5 flex items-center gap-3">
+            <div className="p-2 bg-white rounded-lg border border-[#d4e0d4]">
+              <ArrowDownCircle size={14} className="text-[#2d6a2d]" />
+            </div>
+            <div>
+              <div className="text-xs text-[#8faa8f]">Income received</div>
+              <div className="font-medium tabular-nums text-sm text-[#2d6a2d]">{fmtCZK(totals.incomeTotal)}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <FinancingBreakdown
