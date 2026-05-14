@@ -6,7 +6,7 @@ This file gives Claude Code the context it needs to work on this project. Read i
 
 ## Build status
 
-**App is live at flat-ostrava-finances.vercel.app. Pending push: mobile layout fixes + edit entries + attachments.**
+**App is live at flat-ostrava-finances.vercel.app. All features verified working locally — ready to push.**
 
 ### What's done
 - Full Next.js 15 app scaffold with all pages, API routes, and dashboard
@@ -18,19 +18,20 @@ This file gives Claude Code the context it needs to work on this project. Read i
 - All UI: property header, tab nav, meta editor, entry forms, dashboard, entry edit, file attachments
 - 8/8 mortgage calculator tests passing
 - Tailwind v3 + PostCSS properly wired up (see CSS notes below)
-- Mobile layout fixed for 375–430px viewports (iPhone SE → iPhone 16 Pro)
+- Mobile layout fixed for 375–430px viewports (iPhone SE → iPhone 16 Pro) — no left-side clipping on iOS Safari
 - Tab nav: icon-only on mobile (`hidden sm:inline` labels), full labels on desktop
 - **Entry editing:** pencil icon on each row opens pre-filled form, saves via PATCH
-- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private), displayed as chips with per-file delete. Blobs served via `/api/blob-download` proxy (token never exposed to browser)
+- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private), displayed as chips with per-file delete. Blobs served via `/api/blob-download` proxy (token never exposed to browser). Verified working end-to-end locally.
 - **Notes field:** textarea with placeholder, saves correctly end-to-end
 
 ### What's next
-1. **Test in production** — verify attachments, edit, and notes work on Vercel after this push
+1. **Test in production** — smoke-test attachments and edit on Vercel after push
 2. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
 
 ### Known notes
 - `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname). `drizzle-kit migrate` uses this connection and may silently fail if it points to a different endpoint than the app. **Safe migration method:** use the Node script pattern that uses `DATABASE_URL` directly (see migration history below).
 - `BLOB_READ_WRITE_TOKEN` is set in both `.env.local` and Vercel dashboard. The Blob store is **private access** — all files use `access: "private"` in `put()`. Downloads go through `/api/blob-download?url=...` which fetches with the server token.
+- **`@vercel/blob` must stay on v2+** (currently v2.3.3). v0.x only typed `access: "public"` and had no real private store support — private blob uploads would silently fail. Do NOT downgrade.
 - `drizzle.config.ts` loads `.env.local` via `dotenv`. Migrations must be run **locally** — NOT during Vercel build. The `vercel.json` `buildCommand: "next build"` ensures this.
 - Do NOT add `drizzle-kit migrate` back to the build script or `vercel.json`. Run migrations manually before deploying schema changes.
 - **When adding a new migration:** `pnpm db:migrate` may not apply it if `DATABASE_URL_UNPOOLED` is wrong. Fallback: apply SQL directly via Node — `node -e "require('dotenv').config({path:'.env.local'}); const {neon}=require('@neondatabase/serverless'); neon(process.env.DATABASE_URL)\`YOUR SQL\`.then(()=>console.log('done'))"`.
