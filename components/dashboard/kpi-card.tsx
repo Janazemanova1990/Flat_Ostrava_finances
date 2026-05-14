@@ -10,7 +10,7 @@ type Props = {
 
 export function KpiCard({ label, value, sublabel, icon: Icon, valueColor = "#2d3b2d" }: Props) {
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-6">
+    <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6">
       <div className="flex items-start justify-between mb-3">
         <div className="text-xs uppercase tracking-widest text-[#8faa8f]">{label}</div>
         <Icon size={16} className="text-[#8faa8f]" />

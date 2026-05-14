@@ -13,7 +13,8 @@ const tabs = [
 export function TabNav() {
   const pathname = usePathname();
   return (
-    <nav className="flex gap-1 mb-8 bg-white p-1 rounded-xl border border-[#d4e0d4] w-fit">
+    <nav className="overflow-x-auto scrollbar-hide -mx-6 px-6 mb-8">
+      <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#d4e0d4] w-fit">
       {tabs.map(({ href, label, icon: Icon }) => {
         const active = pathname === href;
         return (
@@ -31,6 +32,7 @@ export function TabNav() {
           </Link>
         );
       })}
+      </div>
     </nav>
   );
 }

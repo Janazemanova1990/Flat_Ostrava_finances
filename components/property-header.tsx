@@ -16,7 +16,7 @@ export function PropertyHeader({ meta }: { meta: Meta }) {
 
   return (
     <header className="mb-10">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 text-[#8faa8f] text-xs tracking-widest uppercase mb-2">
             <Home size={12} />
@@ -26,7 +26,7 @@ export function PropertyHeader({ meta }: { meta: Meta }) {
             <MetaEditor meta={meta} onClose={() => setEditing(false)} />
           ) : (
             <div>
-              <h1 className="font-display text-4xl md:text-5xl font-medium tracking-tight text-[#2d3b2d]">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-medium tracking-tight leading-tight break-words text-[#2d3b2d]">
                 {meta.propertyName}
               </h1>
               <div className="flex gap-2 flex-wrap mt-3">
@@ -46,7 +46,7 @@ export function PropertyHeader({ meta }: { meta: Meta }) {
                   </span>
                 )}
                 {downPayment > 0 && (
-                  <span className="bg-[#1c1917] text-[#fafaf9] text-xs font-medium px-3 py-1 rounded-full">
+                  <span className="bg-[#1c1917] text-[#fafaf9] text-xs font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap">
                     {downPct}% down · {fmtCZK(downPayment)} equity
                   </span>
                 )}
@@ -60,7 +60,7 @@ export function PropertyHeader({ meta }: { meta: Meta }) {
             </div>
           )}
         </div>
-        <div className="flex gap-2 flex-wrap items-start">
+        <div className="flex gap-2 w-full sm:w-auto items-start">
           <a href="/api/export?format=json" className="flex items-center gap-1.5 bg-white border border-[#d4e0d4] text-[#5f7a5f] text-xs font-medium px-3 py-1.5 rounded-lg hover:border-[#3d5c3d]">
             <Download size={12} /> Backup JSON
           </a>
