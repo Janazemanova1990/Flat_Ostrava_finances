@@ -26,12 +26,13 @@
   --radius: 0.5rem;
 }
 
-html, body {
+html {
   overflow-x: hidden;
   width: 100%;
 }
 
 body {
+  max-width: 100%;
   background-color: #f4f7f4;
   background-image:
     radial-gradient(circle at 100% 0%, rgba(134,179,134,0.15) 0%, transparent 50%),

@@ -46,7 +46,7 @@ export function PropertyHeader({ meta }: { meta: Meta }) {
                   </span>
                 )}
                 {downPayment > 0 && (
-                  <span className="bg-[#1c1917] text-[#fafaf9] text-xs font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-full whitespace-nowrap">
+                  <span className="bg-[#1c1917] text-[#fafaf9] text-xs font-medium px-3 py-1.5 sm:px-4 sm:py-2 rounded-full">
                     {downPct}% down · {fmtCZK(downPayment)} equity
                   </span>
                 )}
