@@ -1,0 +1,103 @@
+import { describe, it, expect } from "vitest";
+import { filterEntriesByPeriod } from "./calculations";
+import type { Entry } from "@/db/schema";
+
+function d(offsetMonths: number): string {
+  const date = new Date();
+  date.setMonth(date.getMonth() + offsetMonths);
+  return date.toISOString().slice(0, 10);
+}
+
+function entry(date: string, section = "ongoing", amount = "1000"): Entry {
+  return {
+    id: "00000000-0000-0000-0000-000000000001",
+    section,
+    date,
+    category: "Test",
+    description: null,
+    amount,
+    recurring: false,
+    notes: null,
+    taxDeductible: false,
+    invoiceUrl: null,
+    invoiceFilename: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+describe("filterEntriesByPeriod", () => {
+  describe("all-time", () => {
+    it("returns all entries unchanged", () => {
+      const entries = [entry(d(-5)), entry(d(-2)), entry(d(0))];
+      const { filtered } = filterEntriesByPeriod(entries, "all-time");
+      expect(filtered).toHaveLength(3);
+    });
+
+    it("monthCount = months from earliest entry to today (min 1)", () => {
+      const entries = [entry(d(-5)), entry(d(0))];
+      const { monthCount } = filterEntriesByPeriod(entries, "all-time");
+      expect(monthCount).toBeGreaterThanOrEqual(5);
+      expect(monthCount).toBeLessThanOrEqual(7);
+    });
+
+    it("returns monthCount 1 with no entries", () => {
+      const { filtered, monthCount } = filterEntriesByPeriod([], "all-time");
+      expect(filtered).toHaveLength(0);
+      expect(monthCount).toBe(1);
+    });
+  });
+
+  describe("rolling periods", () => {
+    it("3m: includes entry from 2 months ago, excludes entry from 4 months ago", () => {
+      const entries = [entry(d(-2)), entry(d(-4))];
+      const { filtered, monthCount } = filterEntriesByPeriod(entries, "3m");
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0].date).toBe(d(-2));
+      expect(monthCount).toBe(3);
+    });
+
+    it("6m: monthCount is 6", () => {
+      const { monthCount } = filterEntriesByPeriod([], "6m");
+      expect(monthCount).toBe(6);
+    });
+
+    it("12m: monthCount is 12", () => {
+      const { monthCount } = filterEntriesByPeriod([], "12m");
+      expect(monthCount).toBe(12);
+    });
+  });
+
+  describe("calendar year", () => {
+    it("filters entries to the given year only, monthCount = 12", () => {
+      const entries = [
+        entry("2025-03-15"),
+        entry("2025-11-01"),
+        entry("2024-12-31"),
+        entry("2026-01-01"),
+      ];
+      const { filtered, monthCount } = filterEntriesByPeriod(entries, "2025");
+      expect(filtered).toHaveLength(2);
+      expect(monthCount).toBe(12);
+    });
+  });
+
+  describe("YTD", () => {
+    it("filters entries from Jan 1 of the year to today", () => {
+      const year = new Date().getFullYear();
+      const entries = [
+        entry(`${year}-01-01`),
+        entry(`${year - 1}-12-31`),
+      ];
+      const { filtered } = filterEntriesByPeriod(entries, `${year} YTD`);
+      expect(filtered).toHaveLength(1);
+    });
+
+    it("monthCount = months elapsed in year (min 1)", () => {
+      const year = new Date().getFullYear();
+      const { monthCount } = filterEntriesByPeriod([], `${year} YTD`);
+      expect(monthCount).toBeGreaterThanOrEqual(1);
+      expect(monthCount).toBeLessThanOrEqual(12);
+    });
+  });
+});

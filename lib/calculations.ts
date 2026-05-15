@@ -1,5 +1,7 @@
 import type { Entry, Meta } from "@/db/schema";
 
+export type Period = string; // "3m" | "6m" | "12m" | "2025" | "2026 YTD" | "all-time"
+
 export type Totals = {
   purchaseTotal: number;
   ongoingTotal: number;
@@ -15,6 +17,62 @@ export type Totals = {
   appreciationCZK: number;
   appreciationPct: number;
 };
+
+export function filterEntriesByPeriod(
+  entries: Entry[],
+  period: Period
+): { filtered: Entry[]; monthCount: number } {
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+
+  if (period === "all-time") {
+    if (entries.length === 0) return { filtered: entries, monthCount: 1 };
+    const earliest = entries
+      .map((e) => new Date(e.date))
+      .reduce((min, d) => (d < min ? d : min));
+    const monthCount = Math.max(
+      1,
+      (today.getFullYear() - earliest.getFullYear()) * 12 +
+        (today.getMonth() - earliest.getMonth()) +
+        1
+    );
+    return { filtered: entries, monthCount };
+  }
+
+  const rollingMap: Record<string, number> = { "3m": 3, "6m": 6, "12m": 12 };
+  if (period in rollingMap) {
+    const n = rollingMap[period];
+    const cutoff = new Date(today);
+    cutoff.setMonth(cutoff.getMonth() - n);
+    cutoff.setHours(0, 0, 0, 0);
+    const filtered = entries.filter((e) => new Date(e.date) >= cutoff);
+    return { filtered, monthCount: n };
+  }
+
+  if (period.endsWith(" YTD")) {
+    const year = parseInt(period);
+    const start = new Date(year, 0, 1);
+    const filtered = entries.filter((e) => {
+      const d = new Date(e.date);
+      return d >= start && d <= today;
+    });
+    const monthCount = Math.max(1, today.getMonth() + 1);
+    return { filtered, monthCount };
+  }
+
+  const year = parseInt(period);
+  if (!isNaN(year)) {
+    const start = new Date(year, 0, 1);
+    const end = new Date(year, 11, 31, 23, 59, 59, 999);
+    const filtered = entries.filter((e) => {
+      const d = new Date(e.date);
+      return d >= start && d <= end;
+    });
+    return { filtered, monthCount: 12 };
+  }
+
+  return { filtered: entries, monthCount: 1 };
+}
 
 export function computeTotals(entries: Entry[], meta: Meta): Totals {
   const purchase = entries.filter((e) => e.section === "purchase");
