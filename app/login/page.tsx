@@ -28,10 +28,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#f4f7f4" }}>
-      <div className="bg-white border border-[#d4e0d4] rounded-xl p-8 w-full max-w-sm shadow-sm">
-        <div className="text-xs uppercase tracking-widest text-[#8faa8f] mb-2">Property Finance</div>
-        <h1 className="font-display text-2xl font-medium text-[#2d3b2d] mb-6">Sign in</h1>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "#F5F0E8" }}>
+      <div className="bg-white rounded-xl p-8 w-full max-w-sm shadow-sm" style={{ border: "1px solid #E2D9CC" }}>
+        <div className="text-xs uppercase tracking-widest mb-2" style={{ color: "rgba(30,58,74,0.5)" }}>Property Finance</div>
+        <h1 className="font-display text-2xl font-medium mb-6" style={{ color: "#1E3A4A" }}>Sign in</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="password"
@@ -39,13 +39,15 @@ function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoFocus
-            className="w-full bg-[#f4f7f4] border border-[#d4e0d4] rounded-lg px-3 py-2 text-sm text-[#2d3b2d] outline-none focus:border-[#3d5c3d]"
+            className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+            style={{ background: "#F5F0E8", border: "1px solid #E2D9CC", color: "#1E3A4A" }}
           />
-          {error && <p className="text-sm text-[#8b4a4a]">{error}</p>}
+          {error && <p className="text-sm" style={{ color: "#D4684A" }}>{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#3d5c3d] text-[#f4f7f4] rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+            className="w-full rounded-lg py-2 text-sm font-medium disabled:opacity-50"
+            style={{ background: "#1E3A4A", color: "#F5F0E8" }}
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>

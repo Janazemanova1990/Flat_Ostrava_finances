@@ -7,24 +7,27 @@ export function RecentActivity({ entries }: { entries: Entry[] }) {
     .slice(0, 8);
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-6">
-      <h3 className="font-display text-xl text-[#2d3b2d] mb-4">Recent activity</h3>
+    <div className="bg-white border border-[#E2D9CC] rounded-xl p-4 sm:p-6">
+      <h3 className="font-display text-xl mb-4" style={{ color: "#1E3A4A" }}>Recent activity</h3>
       {recent.length === 0 ? (
-        <p className="text-sm text-[#8faa8f] py-8 text-center">
+        <p className="text-sm py-8 text-center" style={{ color: "rgba(30,58,74,0.5)" }}>
           No transactions yet - start by adding a purchase cost or expense.
         </p>
       ) : (
-        <div className="divide-y divide-[#f0f5f0]">
+        <div className="divide-y" style={{ borderColor: "#E2D9CC" }}>
           {recent.map((tx) => (
             <div key={tx.id} className="flex items-center justify-between py-3 text-sm">
               <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${tx.section === "income" ? "bg-[#2d6a2d]" : "bg-[#8faa8f]"}`} />
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: tx.section === "income" ? "#3D8070" : "rgba(30,58,74,0.32)" }}
+                />
                 <div>
-                  <div className="font-medium text-[#2d3b2d]">{tx.description || tx.category}</div>
-                  <div className="text-xs text-[#8faa8f]">{tx.category} · {tx.date}</div>
+                  <div className="font-medium" style={{ color: "#1E3A4A" }}>{tx.description || tx.category}</div>
+                  <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{tx.category} · {tx.date}</div>
                 </div>
               </div>
-              <div className={`font-medium tabular-nums ${tx.section === "income" ? "text-[#2d6a2d]" : "text-[#2d3b2d]"}`}>
+              <div className="font-medium tabular-nums" style={{ color: tx.section === "income" ? "#3D8070" : "#D4684A" }}>
                 {tx.section === "income" ? "+" : "−"} {fmtCZK(Number(tx.amount))}
               </div>
             </div>

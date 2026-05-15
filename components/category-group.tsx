@@ -11,15 +11,15 @@ type Props = {
 
 export function CategoryGroup({ category, entries, color, onEdit }: Props) {
   const total = entries.reduce((s, e) => s + Number(e.amount), 0);
-  const totalColor = color === "income" ? "text-[#2d6a2d]" : "text-[#2d3b2d]";
+  const totalColor = color === "income" ? "#3D8070" : "#D4684A";
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 bg-[#edf3ed] border-b border-[#d4e0d4] flex items-center justify-between">
-        <span className="text-sm font-semibold text-[#3d5c3d]">{category}</span>
-        <span className={`text-sm font-semibold tabular-nums ${totalColor}`}>{fmtCZK(total)}</span>
+    <div className="bg-white rounded-xl overflow-hidden" style={{ border: "1px solid #E2D9CC" }}>
+      <div className="px-5 py-3 flex items-center justify-between" style={{ background: "rgba(30,58,74,0.05)", borderBottom: "1px solid #E2D9CC" }}>
+        <span className="text-sm font-semibold" style={{ color: "#1E3A4A" }}>{category}</span>
+        <span className="text-sm font-semibold tabular-nums" style={{ color: totalColor }}>{fmtCZK(total)}</span>
       </div>
-      <div className="divide-y divide-[#f0f5f0]">
+      <div className="divide-y" style={{ borderColor: "#E2D9CC" }}>
         {entries
           .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
           .map((e) => (

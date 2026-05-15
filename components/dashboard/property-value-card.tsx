@@ -31,12 +31,15 @@ export function PropertyValueCard({ meta }: { meta: Meta }) {
   }
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-6">
+    <div className="bg-white border border-[#E2D9CC] rounded-xl p-4 sm:p-6">
       <div className="flex justify-between items-center mb-4">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#2d3b2d]">Property value</span>
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "#1E3A4A" }}>Property value</span>
         {!editing && (
-          <button onClick={() => { setValue(String(currentValue || "")); setEditing(true); }}
-            className="text-xs text-[#3d5c3d] border border-[#d4e0d4] rounded-lg px-3 py-1 hover:bg-[#f4f7f4]">
+          <button
+            onClick={() => { setValue(String(currentValue || "")); setEditing(true); }}
+            className="text-xs rounded-lg px-3 py-1 transition-colors"
+            style={{ color: "#3D8070", border: "1px solid #E2D9CC" }}
+          >
             {hasEstimate ? "Update estimate" : "Add estimate"}
           </button>
         )}
@@ -44,43 +47,54 @@ export function PropertyValueCard({ meta }: { meta: Meta }) {
 
       {editing ? (
         <div className="flex gap-2">
-          <input type="number" value={value} onChange={(e) => setValue(e.target.value)}
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
             placeholder="Current estimate (Kč)"
-            className="flex-1 bg-[#f4f7f4] border border-[#d4e0d4] rounded-lg px-3 py-2 text-sm text-[#2d3b2d] outline-none focus:border-[#3d5c3d]" />
-          <button onClick={saveEstimate} className="bg-[#3d5c3d] text-[#f4f7f4] px-4 py-2 rounded-lg text-sm font-medium">Save</button>
-          <button onClick={() => setEditing(false)} className="text-[#8faa8f] px-3 py-2 rounded-lg text-sm">Cancel</button>
+            className="flex-1 rounded-lg px-3 py-2 text-sm outline-none"
+            style={{ background: "#F5F0E8", border: "1px solid #E2D9CC", color: "#1E3A4A" }}
+          />
+          <button
+            onClick={saveEstimate}
+            className="px-4 py-2 rounded-lg text-sm font-medium"
+            style={{ background: "#1E3A4A", color: "#F5F0E8" }}
+          >
+            Save
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            className="px-3 py-2 rounded-lg text-sm"
+            style={{ color: "rgba(30,58,74,0.5)" }}
+          >
+            Cancel
+          </button>
         </div>
       ) : hasEstimate ? (
-        <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div>
-            <div className="text-xs text-[#8faa8f] mb-1">Purchased at</div>
-            <div className="font-display text-xl font-medium text-[#2d3b2d]">{fmtCZK(purchasePrice)}</div>
-          </div>
-          <div className="text-[#8faa8f] text-xl">→</div>
-          <div>
-            <div className="text-xs text-[#8faa8f] mb-1">Current estimate</div>
-            <div className="font-display text-xl font-medium text-[#2d3b2d]">{fmtCZK(currentValue)}</div>
+            <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: "rgba(30,58,74,0.5)" }}>Purchased at</div>
+            <div className="font-display text-lg font-medium tabular-nums" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</div>
           </div>
           <div>
-            <div className="text-xs text-[#8faa8f] mb-1">Gain</div>
-            <div className={`font-display text-xl font-medium ${gainCZK >= 0 ? "text-[#2d6a2d]" : "text-[#8b4a4a]"}`}>
+            <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: "rgba(30,58,74,0.5)" }}>Current estimate</div>
+            <div className="font-display text-lg font-medium tabular-nums" style={{ color: "#1E3A4A" }}>{fmtCZK(currentValue)}</div>
+            {updatedAt && <div className="text-[10px] mt-0.5" style={{ color: "rgba(30,58,74,0.32)" }}>{updatedAt}</div>}
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-wider mb-1" style={{ color: "rgba(30,58,74,0.5)" }}>Gain</div>
+            <div className="font-display text-lg font-medium tabular-nums" style={{ color: gainCZK >= 0 ? "#3D8070" : "#D4684A" }}>
               {gainCZK >= 0 ? "+" : ""}{fmtCZK(gainCZK)}
             </div>
-          </div>
-          <div>
-            <div className="text-xs text-[#8faa8f] mb-1">Return</div>
-            <div className={`font-display text-xl font-medium ${gainPct >= 0 ? "text-[#2d6a2d]" : "text-[#8b4a4a]"}`}>
+            <div className="text-[10px] mt-0.5 tabular-nums" style={{ color: gainPct >= 0 ? "#3D8070" : "#D4684A" }}>
               {gainPct >= 0 ? "+" : ""}{gainPct.toFixed(1)}%
             </div>
           </div>
         </div>
       ) : (
-        <p className="text-sm text-[#8faa8f]">
+        <p className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
           No estimate yet. Add a current market value from Sreality.cz to track appreciation.
         </p>
-      )}
-      {updatedAt && !editing && (
-        <div className="text-[10px] text-[#8faa8f] mt-3">Last updated: {updatedAt}</div>
       )}
     </div>
   );

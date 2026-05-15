@@ -39,15 +39,20 @@ export function InvoiceUpload({ value, onChange }: Props) {
 
   if (value) {
     return (
-      <div className="flex items-center gap-3 bg-white border border-[#d4e0d4] rounded-lg px-3 py-2.5">
-        <FileText size={16} className="text-[#3d5c3d] flex-shrink-0" />
+      <div className="flex items-center gap-3 bg-white rounded-lg px-3 py-2.5" style={{ border: "1px solid #E2D9CC" }}>
+        <FileText size={16} className="flex-shrink-0" style={{ color: "#3D8070" }} />
         <div className="flex-1 min-w-0">
-          <a href={`/api/blob-download?url=${encodeURIComponent(value.url)}`} target="_blank" rel="noopener noreferrer"
-            className="text-sm font-medium text-[#2d3b2d] hover:text-[#3d5c3d] truncate block">
+          <a
+            href={`/api/blob-download?url=${encodeURIComponent(value.url)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium truncate block hover:underline"
+            style={{ color: "#1E3A4A" }}
+          >
             {value.filename}
           </a>
         </div>
-        <button onClick={handleRemove} className="text-[#8b4a4a] hover:text-[#2d3b2d]">
+        <button onClick={handleRemove} style={{ color: "#D4684A" }}>
           <X size={14} />
         </button>
       </div>
@@ -55,17 +60,17 @@ export function InvoiceUpload({ value, onChange }: Props) {
   }
 
   return (
-    <label className={`flex items-center gap-3 border-2 border-dashed border-[#b8d0b8] rounded-lg px-3 py-3 cursor-pointer hover:border-[#3d5c3d] hover:bg-[#edf3ed] transition ${uploading ? "opacity-50 pointer-events-none" : ""}`}>
-      <div className="w-8 h-8 bg-[#e8f0e8] rounded-lg flex items-center justify-center flex-shrink-0">
-        <Paperclip size={15} className="text-[#3d5c3d]" />
+    <label className={`flex items-center gap-3 rounded-lg px-3 py-3 cursor-pointer transition ${uploading ? "opacity-50 pointer-events-none" : ""}`} style={{ border: "2px dashed #E2D9CC" }}>
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(61,128,112,0.1)" }}>
+        <Paperclip size={15} style={{ color: "#3D8070" }} />
       </div>
       <div className="flex-1">
-        <div className="text-sm font-medium text-[#2d3b2d]">
+        <div className="text-sm font-medium" style={{ color: "#1E3A4A" }}>
           {uploading ? "Uploading…" : "Attach invoice or receipt"}
         </div>
-        <div className="text-xs text-[#8faa8f]">PDF, JPG, PNG - max 10 MB</div>
+        <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>PDF, JPG, PNG - max 10 MB</div>
       </div>
-      <span className="bg-white border border-[#d4e0d4] text-[#3d5c3d] text-xs font-semibold px-3 py-1 rounded-md">
+      <span className="bg-white text-xs font-semibold px-3 py-1 rounded-md" style={{ border: "1px solid #E2D9CC", color: "#3D8070" }}>
         Browse
       </span>
       <input
@@ -74,7 +79,7 @@ export function InvoiceUpload({ value, onChange }: Props) {
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
       />
-      {error && <p className="text-xs text-[#8b4a4a] mt-1">{error}</p>}
+      {error && <p className="text-xs mt-1" style={{ color: "#D4684A" }}>{error}</p>}
     </label>
   );
 }

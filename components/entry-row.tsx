@@ -23,10 +23,10 @@ export function EntryRow({ entry, color, onEdit }: Props) {
 
   const isRecurring = entry.recurring;
   const amountColor = isRecurring
-    ? "text-[#6d28d9]"
+    ? "#1E3A4A"
     : color === "income"
-    ? "text-[#2d6a2d]"
-    : "text-[#2d3b2d]";
+    ? "#3D8070"
+    : "#D4684A";
 
   const allAttachments = [
     ...(entry.invoiceUrl
@@ -45,11 +45,11 @@ export function EntryRow({ entry, color, onEdit }: Props) {
           onClick={() => hasDetail && setExpanded((v) => !v)}
         >
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-medium text-[#2d3b2d] truncate">
+            <span className="text-sm font-medium truncate" style={{ color: "#1E3A4A" }}>
               {entry.description || entry.category}
             </span>
             {allAttachments.length > 0 && (
-              <span className="flex items-center gap-0.5 text-[#8faa8f] shrink-0">
+              <span className="flex items-center gap-0.5 shrink-0" style={{ color: "rgba(30,58,74,0.5)" }}>
                 <Paperclip size={11} />
                 <span className="text-xs">{allAttachments.length}</span>
               </span>
@@ -57,32 +57,35 @@ export function EntryRow({ entry, color, onEdit }: Props) {
             {hasDetail && (
               <ChevronDown
                 size={12}
-                className={`text-[#8faa8f] shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                className={`shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                style={{ color: "rgba(30,58,74,0.5)" }}
               />
             )}
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xs text-[#8faa8f]">{entry.date}</span>
+            <span className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{entry.date}</span>
             {entry.taxDeductible && (
-              <span className="text-xs text-[#8b4a4a]">· ⊛ tax deductible</span>
+              <span className="text-xs" style={{ color: "#D4684A" }}>· ⊛ tax deductible</span>
             )}
           </div>
         </button>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className={`text-sm font-medium tabular-nums ${amountColor}`}>
+          <span className="text-sm font-medium tabular-nums" style={{ color: amountColor }}>
             {isRecurring && <span className="mr-1">↻</span>}{fmtCZK(Number(entry.amount))}
           </span>
           <button
             onClick={onEdit}
-            className="text-[#8faa8f] hover:text-[#3d5c3d] p-1 rounded"
+            className="p-1 rounded transition-colors"
+            style={{ color: "rgba(30,58,74,0.4)" }}
             title="Edit"
           >
             <Pencil size={13} />
           </button>
           <button
             onClick={handleDelete}
-            className="text-[#8faa8f] hover:text-[#8b4a4a] p-1 rounded"
+            className="p-1 rounded transition-colors"
+            style={{ color: "rgba(30,58,74,0.4)" }}
             title="Delete"
           >
             <Trash2 size={13} />
@@ -91,9 +94,9 @@ export function EntryRow({ entry, color, onEdit }: Props) {
       </div>
 
       {expanded && hasDetail && (
-        <div className="mt-2 pt-2 border-t border-[#f0f5f0] space-y-2">
+        <div className="mt-2 pt-2 space-y-2" style={{ borderTop: "1px solid #E2D9CC" }}>
           {entry.notes && (
-            <p className="text-xs text-[#5f7a5f]">{entry.notes}</p>
+            <p className="text-xs" style={{ color: "rgba(30,58,74,0.6)" }}>{entry.notes}</p>
           )}
           {allAttachments.length > 0 && (
             <div className="flex flex-col gap-1">
@@ -103,7 +106,8 @@ export function EntryRow({ entry, color, onEdit }: Props) {
                   href={`/api/blob-download?url=${encodeURIComponent(a.blobUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-[#5f7a5f] hover:text-[#3d5c3d] transition-colors"
+                  className="flex items-center gap-1.5 text-xs transition-colors"
+                  style={{ color: "#3D8070" }}
                 >
                   <Paperclip size={11} />
                   <span className="truncate">{a.filename}</span>

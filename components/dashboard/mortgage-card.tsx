@@ -6,7 +6,7 @@ type Props = { params: MortgageParams };
 export function MortgageCard({ params }: Props) {
   if (!params.principal || !params.annualRate || !params.startDate) {
     return (
-      <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6 text-sm text-[#8faa8f]">
+      <div className="bg-white border border-[#E2D9CC] rounded-xl p-4 sm:p-6 text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
         Add mortgage details in property settings to see payoff progress.
       </div>
     );
@@ -21,106 +21,82 @@ export function MortgageCard({ params }: Props) {
   const split = paymentSplit(params, monthsElapsed);
   const totals = totalsToDate(params);
   const n = params.termYears * 12;
-  const paidPct = ((totals.principalPaid / params.principal) * 100).toFixed(1);
-  const interestPaidPct = ((totals.interestPaid / totals.totalProjectedInterest) * 100).toFixed(1);
+  const paidPct = Number(((totals.principalPaid / params.principal) * 100).toFixed(1));
+  const interestPaidPct = Number(((totals.interestPaid / totals.totalProjectedInterest) * 100).toFixed(1));
   const equityPct = Math.round((split.principal / M) * 100);
   const interestPct = 100 - equityPct;
   const yearsLeft = Math.floor((n - monthsElapsed) / 12);
   const moLeft = (n - monthsElapsed) % 12;
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-4 sm:p-6">
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#2d3b2d]">Mortgage payoff</span>
-        <span className="text-xs text-[#8faa8f]">
+    <div className="bg-white border border-[#E2D9CC] rounded-xl p-4 sm:p-6">
+      <div className="flex justify-between items-center mb-5">
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "#1E3A4A" }}>Mortgage payoff</span>
+        <span className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
           {(params.annualRate * 100).toFixed(2)}% · {params.termYears}yr
           {params.mortgageRateFixedUntil ? ` · fixed until ${params.mortgageRateFixedUntil}` : ""}
         </span>
       </div>
 
-      <div className="bg-[#f4f7f4] rounded-lg px-4 py-3 flex items-center gap-2 mb-4 flex-wrap">
-        <div className="text-center flex-1">
-          <div className="text-sm font-bold tabular-nums text-[#2d3b2d]">{fmtCZK(M)}</div>
-          <div className="text-[10px] text-[#8faa8f]">monthly payment</div>
+      {/* Monthly payment breakdown — text first */}
+      <div className="rounded-lg px-4 py-3 mb-5" style={{ background: "rgba(30,58,74,0.06)", border: "1px solid #E2D9CC" }}>
+        <div className="text-sm font-medium mb-1" style={{ color: "#1E3A4A" }}>
+          <span className="font-display text-lg tabular-nums">{fmtCZK(M)}</span>
+          <span style={{ color: "rgba(30,58,74,0.5)" }}> / month</span>
         </div>
-        <div className="text-[#8faa8f] font-bold">=</div>
-        <div className="text-center flex-1">
-          <div className="text-sm font-bold tabular-nums text-[#2d6a2d]">{fmtCZK(split.principal)}</div>
-          <div className="text-[10px] text-[#8faa8f]">→ your property</div>
-        </div>
-        <div className="text-[#8faa8f] font-bold">+</div>
-        <div className="text-center flex-1">
-          <div className="text-sm font-bold tabular-nums text-[#6d28d9]">{fmtCZK(split.interest)}</div>
-          <div className="text-[10px] text-[#8faa8f]">→ interest</div>
+        <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
+          <span className="tabular-nums font-medium" style={{ color: "#3D8070" }}>{fmtCZK(split.principal)}</span>
+          {" "}→ your property
+          <span className="mx-2">·</span>
+          <span className="tabular-nums font-medium" style={{ color: "#D4684A" }}>{fmtCZK(split.interest)}</span>
+          {" "}→ interest
         </div>
       </div>
 
-      <div className="bg-[#1c1917] rounded-xl p-4 mb-3">
-        <div className="text-[9px] font-bold uppercase tracking-widest text-[#6b7280] mb-3">Going to your property (principal)</div>
-        <div className="flex justify-between items-end mb-2">
+      {/* Principal progress */}
+      <div className="mb-4">
+        <div className="flex justify-between items-baseline mb-2">
           <div>
-            <div className="font-display text-xl font-semibold text-[#d1fae5]">{fmtCZK(totals.principalPaid)}</div>
-            <div className="text-[10px] text-[#6ee7b7]">equity built to date</div>
+            <span className="text-xs uppercase tracking-widest font-bold" style={{ color: "#3D8070" }}>Principal paid</span>
           </div>
-          <div className="text-right">
-            <div className="text-sm font-semibold text-white">{fmtCZK(totals.remainingBalance)}</div>
-            <div className="text-[10px] text-[#6b7280]">remaining balance</div>
+          <div className="text-right text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <span className="tabular-nums font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(totals.principalPaid)}</span>
+            {" "}of{" "}
+            <span className="tabular-nums">{fmtCZK(params.principal)}</span>
           </div>
         </div>
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-1">
-          <div className="h-full bg-[#d1fae5] rounded-full" style={{ width: `${Math.max(0.3, Number(paidPct))}%` }} />
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(61,128,112,0.12)" }}>
+          <div className="h-full rounded-full" style={{ width: `${Math.max(0.5, paidPct)}%`, background: "#3D8070" }} />
         </div>
-        <div className="flex justify-between text-[9px] text-[#6b7280]">
-          <span className="text-[#6ee7b7]">{paidPct}% yours so far</span>
-          <span>payoff: {totals.payoffDate}</span>
-        </div>
-        <div className="flex gap-2 mt-3">
-          {[
-            { v: fmtCZK(split.principal), l: "principal/month" },
-            { v: `${equityPct}%`, l: "payment → equity" },
-            { v: `${yearsLeft}yr ${moLeft}mo`, l: "remaining" },
-          ].map(({ v, l }) => (
-            <div key={l} className="flex-1 bg-white/10 rounded-lg p-2 text-center">
-              <div className="text-sm font-semibold text-white tabular-nums">{v}</div>
-              <div className="text-[9px] text-[#6b7280] mt-0.5">{l}</div>
-            </div>
-          ))}
+        <div className="flex justify-between mt-1 text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
+          <span>{paidPct}% yours so far</span>
+          <span>{yearsLeft}yr {moLeft}mo left · payoff {totals.payoffDate}</span>
         </div>
       </div>
 
-      <div className="bg-[#f5f3ff] border border-[#ddd6fe] rounded-xl p-4">
-        <div className="text-[9px] font-bold uppercase tracking-widest text-[#8b5cf6]/70 mb-3">Interest payments</div>
-        <div className="flex justify-between items-end mb-2">
+      {/* Interest progress */}
+      <div className="mb-4">
+        <div className="flex justify-between items-baseline mb-2">
           <div>
-            <div className="font-display text-xl font-semibold text-[#6d28d9]">{fmtCZK(totals.interestPaid)}</div>
-            <div className="text-[10px] text-[#7c3aed]/70">interest paid to date</div>
+            <span className="text-xs uppercase tracking-widest font-bold" style={{ color: "#D4684A" }}>Interest paid</span>
           </div>
-          <div className="text-right">
-            <div className="text-sm font-semibold text-[#4c1d95]">{fmtCZK(totals.totalProjectedInterest)}</div>
-            <div className="text-[10px] text-[#8b5cf6]/70">projected total interest</div>
+          <div className="text-right text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <span className="tabular-nums font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(totals.interestPaid)}</span>
+            {" "}of{" "}
+            <span className="tabular-nums">{fmtCZK(totals.totalProjectedInterest)}</span>
+            {" "}projected
           </div>
         </div>
-        <div className="h-2 bg-[#ddd6fe] rounded-full overflow-hidden mb-1">
-          <div className="h-full bg-[#7c3aed] rounded-full" style={{ width: `${Math.max(0.3, Number(interestPaidPct))}%` }} />
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(212,104,74,0.12)" }}>
+          <div className="h-full rounded-full" style={{ width: `${Math.max(0.5, interestPaidPct)}%`, background: "#D4684A" }} />
         </div>
-        <div className="flex justify-between text-[9px] text-[#8b5cf6]/70">
+        <div className="flex justify-between mt-1 text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
           <span>{interestPaidPct}% of total interest paid</span>
-          <span>over {params.termYears} years</span>
-        </div>
-        <div className="flex gap-2 mt-3">
-          {[
-            { v: fmtCZK(split.interest), l: "interest/month" },
-            { v: `${interestPct}%`, l: "payment → bank" },
-            { v: fmtCZK(totals.totalProjectedInterest), l: "total projected" },
-          ].map(({ v, l }) => (
-            <div key={l} className="flex-1 bg-white border border-[#ddd6fe] rounded-lg p-2 text-center">
-              <div className="text-sm font-semibold text-[#6d28d9] tabular-nums">{v}</div>
-              <div className="text-[9px] text-[#8b5cf6]/80 mt-0.5">{l}</div>
-            </div>
-          ))}
+          <span>{equityPct}% of payment → equity · {interestPct}% → bank</span>
         </div>
       </div>
-      <div className="text-[9px] text-[#8faa8f] text-center mt-3">
+
+      <div className="text-[10px] text-center mt-3" style={{ color: "rgba(30,58,74,0.32)" }}>
         Calculated automatically · update rate when fixed period resets
       </div>
     </div>

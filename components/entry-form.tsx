@@ -150,30 +150,38 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
   }
 
   const inputClass =
-    "w-full bg-[#f4f7f4] border border-[#d4e0d4] rounded-lg px-3 py-2 text-sm text-[#2d3b2d] outline-none focus:border-[#3d5c3d]";
+    "w-full rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#1E3A4A]";
+  const inputStyle = {
+    background: "#F5F0E8",
+    border: "1px solid #E2D9CC",
+    color: "#1E3A4A",
+  };
   const labelClass =
-    "block text-xs text-[#5f7a5f] uppercase tracking-wider font-semibold mb-1";
+    "block text-xs uppercase tracking-wider font-semibold mb-1";
+  const labelStyle = { color: "rgba(30,58,74,0.6)" };
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-5">
-      <div className="text-xs font-semibold uppercase tracking-widest text-[#8faa8f] mb-3">
+    <div className="bg-white rounded-xl p-5" style={{ border: "1px solid #E2D9CC" }}>
+      <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "rgba(30,58,74,0.5)" }}>
         {isEdit ? "Edit entry" : "New entry"}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
         <div>
-          <label className={labelClass}>Date</label>
+          <label className={labelClass} style={labelStyle}>Date</label>
           <input
             type="date"
             className={inputClass}
+            style={inputStyle}
             value={draft.date}
             onChange={(e) => setDraft({ ...draft, date: e.target.value })}
           />
         </div>
         <div>
-          <label className={labelClass}>Category</label>
+          <label className={labelClass} style={labelStyle}>Category</label>
           <select
             className={inputClass}
+            style={inputStyle}
             value={draft.category}
             onChange={(e) => setDraft({ ...draft, category: e.target.value, recurring: e.target.value === "Rent" ? true : draft.recurring })}
           >
@@ -183,28 +191,31 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
           </select>
         </div>
         <div>
-          <label className={labelClass}>Amount (Kč)</label>
+          <label className={labelClass} style={labelStyle}>Amount (Kč)</label>
           <input
             type="number"
             className={inputClass}
+            style={inputStyle}
             value={draft.amount}
             placeholder="0"
             onChange={(e) => setDraft({ ...draft, amount: e.target.value })}
           />
         </div>
         <div>
-          <label className={labelClass}>Description</label>
+          <label className={labelClass} style={labelStyle}>Description</label>
           <input
             className={inputClass}
+            style={inputStyle}
             value={draft.description}
             placeholder="Optional"
             onChange={(e) => setDraft({ ...draft, description: e.target.value })}
           />
         </div>
         <div className="sm:col-span-2 lg:col-span-4">
-          <label className={labelClass}>Notes</label>
+          <label className={labelClass} style={labelStyle}>Notes</label>
           <textarea
             className={`${inputClass} resize-none`}
+            style={inputStyle}
             rows={2}
             value={draft.notes}
             placeholder="Reference numbers, context, anything useful…"
@@ -216,31 +227,31 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
       {(showRecurring || showTax) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
           {showRecurring && (
-            <label className="flex items-center gap-2.5 bg-[#f4f7f4] border border-[#d4e0d4] rounded-lg px-3 py-2.5 cursor-pointer">
+            <label className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer" style={{ background: "#F5F0E8", border: "1px solid #E2D9CC" }}>
               <input
                 type="checkbox"
                 checked={draft.recurring}
                 onChange={(e) => setDraft({ ...draft, recurring: e.target.checked })}
-                className="accent-[#3d5c3d] w-4 h-4"
+                className="accent-[#3D8070] w-4 h-4"
               />
-              <CalendarClock size={14} className="text-[#3d5c3d]" />
+              <CalendarClock size={14} style={{ color: "#3D8070" }} />
               <div>
-                <div className="text-sm font-medium text-[#2d3b2d]">Monthly recurring</div>
-                <div className="text-xs text-[#8faa8f]">Used for cash flow calculations</div>
+                <div className="text-sm font-medium" style={{ color: "#1E3A4A" }}>Monthly recurring</div>
+                <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>Used for cash flow calculations</div>
               </div>
             </label>
           )}
           {showTax && (
-            <label className="flex items-center gap-2.5 bg-[#f5e8e8] border border-[#e8c8c8] rounded-lg px-3 py-2.5 cursor-pointer">
+            <label className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer" style={{ background: "rgba(212,104,74,0.08)", border: "1px solid rgba(212,104,74,0.2)" }}>
               <input
                 type="checkbox"
                 checked={draft.taxDeductible}
                 onChange={(e) => setDraft({ ...draft, taxDeductible: e.target.checked })}
-                className="accent-[#8b4a4a] w-4 h-4"
+                className="accent-[#D4684A] w-4 h-4"
               />
               <div>
-                <div className="text-sm font-medium text-[#2d3b2d]">Tax deductible</div>
-                <div className="text-xs text-[#c17a7a]">Included in tax export</div>
+                <div className="text-sm font-medium" style={{ color: "#1E3A4A" }}>Tax deductible</div>
+                <div className="text-xs" style={{ color: "#D4684A" }}>Included in tax export</div>
               </div>
             </label>
           )}
@@ -248,7 +259,7 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
       )}
 
       <div className="mb-3">
-        <label className={labelClass}>Invoice / receipt</label>
+        <label className={labelClass} style={labelStyle}>Invoice / receipt</label>
         <InvoiceUpload
           value={
             draft.invoiceUrl
@@ -267,23 +278,24 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
 
       {existingAttachments.length > 0 && (
         <div className="mb-3">
-          <label className={labelClass}>Attached files</label>
+          <label className={labelClass} style={labelStyle}>Attached files</label>
           <div className="space-y-1">
             {existingAttachments.map((a) => (
-              <div key={a.id} className="flex items-center gap-2 text-xs bg-[#f4f7f4] rounded-lg px-3 py-1.5">
-                <FileText size={12} className="text-[#3d5c3d] flex-shrink-0" />
+              <div key={a.id} className="flex items-center gap-2 text-xs rounded-lg px-3 py-1.5" style={{ background: "#F5F0E8" }}>
+                <FileText size={12} className="flex-shrink-0" style={{ color: "#3D8070" }} />
                 <a
                   href={`/api/blob-download?url=${encodeURIComponent(a.blobUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 truncate text-[#2d3b2d] hover:underline"
+                  className="flex-1 truncate hover:underline"
+                  style={{ color: "#1E3A4A" }}
                 >
                   {a.filename}
                 </a>
                 <button
                   type="button"
                   onClick={() => handleDeleteAttachment(a.id)}
-                  className="text-[#8faa8f] hover:text-[#8b4a4a]"
+                  style={{ color: "rgba(30,58,74,0.4)" }}
                   title="Remove"
                 >
                   <X size={12} />
@@ -295,16 +307,14 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
       )}
 
       <div className="mb-4">
-        <label className={labelClass}>Add more files</label>
-        <label
-          className={`flex items-center gap-3 border-2 border-dashed border-[#b8d0b8] rounded-lg px-3 py-2.5 cursor-pointer hover:border-[#3d5c3d] hover:bg-[#edf3ed] transition`}
-        >
-          <div className="w-7 h-7 bg-[#e8f0e8] rounded-lg flex items-center justify-center flex-shrink-0">
-            <Paperclip size={14} className="text-[#3d5c3d]" />
+        <label className={labelClass} style={labelStyle}>Add more files</label>
+        <label className="flex items-center gap-3 rounded-lg px-3 py-2.5 cursor-pointer transition" style={{ border: "2px dashed #E2D9CC" }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(61,128,112,0.1)" }}>
+            <Paperclip size={14} style={{ color: "#3D8070" }} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm text-[#2d3b2d]">Attach more files</div>
-            <div className="text-xs text-[#8faa8f]">PDF, JPG, PNG, HEIC - max 10 MB each</div>
+            <div className="text-sm" style={{ color: "#1E3A4A" }}>Attach more files</div>
+            <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>PDF, JPG, PNG, HEIC - max 10 MB each</div>
           </div>
           <input
             type="file"
@@ -314,32 +324,32 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
             onChange={handleFileSelect}
           />
         </label>
-        {fileError && <p className="text-xs text-[#8b4a4a] mt-1">{fileError}</p>}
+        {fileError && <p className="text-xs mt-1" style={{ color: "#D4684A" }}>{fileError}</p>}
         {pendingFiles.length > 0 && (
           <div className="mt-2 space-y-1">
             {pendingFiles.map((pf, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs bg-[#f4f7f4] rounded-lg px-3 py-1.5">
-                <FileText size={12} className="text-[#3d5c3d] flex-shrink-0" />
-                <span className="flex-1 truncate text-[#2d3b2d]">{pf.file.name}</span>
+              <div key={i} className="flex items-center gap-2 text-xs rounded-lg px-3 py-1.5" style={{ background: "#F5F0E8" }}>
+                <FileText size={12} className="flex-shrink-0" style={{ color: "#3D8070" }} />
+                <span className="flex-1 truncate" style={{ color: "#1E3A4A" }}>{pf.file.name}</span>
                 {pf.status === "pending" && (
                   <button
                     type="button"
                     onClick={() =>
                       setPendingFiles((prev) => prev.filter((_, j) => j !== i))
                     }
-                    className="text-[#8faa8f] hover:text-[#8b4a4a]"
+                    style={{ color: "rgba(30,58,74,0.4)" }}
                   >
                     <X size={12} />
                   </button>
                 )}
                 {pf.status === "uploading" && (
-                  <span className="text-[#8faa8f]">Uploading…</span>
+                  <span style={{ color: "rgba(30,58,74,0.5)" }}>Uploading…</span>
                 )}
                 {pf.status === "done" && (
-                  <span className="text-[#2d6a2d]">✓ Uploaded</span>
+                  <span style={{ color: "#3D8070" }}>✓ Uploaded</span>
                 )}
                 {pf.status === "error" && (
-                  <span className="text-[#8b4a4a]">{pf.error}</span>
+                  <span style={{ color: "#D4684A" }}>{pf.error}</span>
                 )}
               </div>
             ))}
@@ -347,20 +357,22 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
         )}
       </div>
 
-      {error && <p className="text-sm text-[#8b4a4a] mb-3">{error}</p>}
+      {error && <p className="text-sm mb-3" style={{ color: "#D4684A" }}>{error}</p>}
 
-      <div className="flex gap-2 pt-3 border-t border-[#e8f0e8]">
+      <div className="flex gap-2 pt-3" style={{ borderTop: "1px solid #E2D9CC" }}>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-1.5 bg-[#3d5c3d] text-[#f4f7f4] px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
+          style={{ background: "#1E3A4A", color: "#F5F0E8" }}
         >
           <Check size={14} />
           {saving ? "Saving…" : isEdit ? "Save changes" : "Save entry"}
         </button>
         <button
           onClick={onCancel}
-          className="text-[#8faa8f] hover:text-[#2d3b2d] px-3 py-2 rounded-lg text-sm"
+          className="px-3 py-2 rounded-lg text-sm"
+          style={{ color: "rgba(30,58,74,0.5)" }}
         >
           Cancel
         </button>

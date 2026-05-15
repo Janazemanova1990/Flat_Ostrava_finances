@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, DM_Serif_Display } from "next/font/google";
+import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -7,9 +7,9 @@ const dmSans = DM_Sans({
   variable: "--font-inter",
 });
 
-const dmSerifDisplay = DM_Serif_Display({
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
-  weight: "400",
+  weight: ["500", "600"],
   variable: "--font-fraunces",
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs">
-      <body className={`${dmSans.variable} ${dmSerifDisplay.variable}`}>{children}</body>
+      <body className={`${dmSans.variable} ${playfairDisplay.variable}`}>{children}</body>
     </html>
   );
 }

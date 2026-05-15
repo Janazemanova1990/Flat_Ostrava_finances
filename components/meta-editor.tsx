@@ -33,19 +33,20 @@ export function MetaEditor({ meta, onClose }: { meta: Meta; onClose: () => void 
   }
 
   const field = (label: string, key: keyof typeof draft, type = "text") => (
-    <label key={key} className="block text-xs text-[#5f7a5f] uppercase tracking-wider font-semibold">
+    <label key={key} className="block text-xs uppercase tracking-wider font-semibold" style={{ color: "rgba(30,58,74,0.6)" }}>
       {label}
       <input
         type={type}
         value={draft[key]}
         onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-        className="mt-1 block w-full bg-[#f4f7f4] border border-[#d4e0d4] rounded-lg px-3 py-2 text-sm text-[#2d3b2d] outline-none focus:border-[#3d5c3d]"
+        className="mt-1 block w-full rounded-lg px-3 py-2 text-sm outline-none"
+        style={{ background: "#F5F0E8", border: "1px solid #E2D9CC", color: "#1E3A4A" }}
       />
     </label>
   );
 
   return (
-    <div className="bg-white border border-[#d4e0d4] rounded-xl p-5 max-w-2xl">
+    <div className="bg-white rounded-xl p-5 max-w-2xl" style={{ border: "1px solid #E2D9CC" }}>
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="col-span-2">{field("Property name", "propertyName")}</div>
         {field("Purchase price (Kč)", "purchasePrice", "number")}
@@ -59,10 +60,18 @@ export function MetaEditor({ meta, onClose }: { meta: Meta; onClose: () => void 
         <div className="col-span-2">{field("Current property estimate (Kč)", "currentPropertyValue", "number")}</div>
       </div>
       <div className="flex gap-2">
-        <button onClick={save} className="flex items-center gap-1.5 bg-[#3d5c3d] text-[#f4f7f4] px-4 py-2 rounded-lg text-sm font-medium">
+        <button
+          onClick={save}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium"
+          style={{ background: "#1E3A4A", color: "#F5F0E8" }}
+        >
           <Check size={14} /> Save
         </button>
-        <button onClick={onClose} className="text-[#8faa8f] hover:text-[#2d3b2d] px-3 py-2 rounded-lg">
+        <button
+          onClick={onClose}
+          className="px-3 py-2 rounded-lg"
+          style={{ color: "rgba(30,58,74,0.5)" }}
+        >
           <X size={14} />
         </button>
       </div>
