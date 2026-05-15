@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { filterEntriesByPeriod } from "./calculations";
+import { filterEntriesByPeriod, computeTotals } from "./calculations";
+import type { Meta } from "@/db/schema";
 import type { Entry } from "@/db/schema";
 
 function d(offsetMonths: number): string {
@@ -99,5 +100,64 @@ describe("filterEntriesByPeriod", () => {
       expect(monthCount).toBeGreaterThanOrEqual(1);
       expect(monthCount).toBeLessThanOrEqual(12);
     });
+  });
+});
+
+const baseMeta: Meta = {
+  id: 1,
+  propertyName: "Test",
+  purchasePrice: "3000000",
+  mortgageAmount: "2400000",
+  targetMonthlyRent: "0",
+  sizeM2: "60",
+  mortgageRate: "0.0464",
+  mortgageTermYears: 30,
+  mortgageStartDate: "2025-12-01",
+  mortgageRateFixedUntil: null,
+  currentPropertyValue: "3200000",
+  currentPropertyValueUpdatedAt: null,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+describe("computeTotals", () => {
+  it("monthlyIncome = sum of income entries / monthCount", () => {
+    const all = [
+      entry("2025-01-01", "income", "15000"),
+      entry("2025-02-01", "income", "15000"),
+      entry("2025-03-01", "income", "15000"),
+    ];
+    const totals = computeTotals(all, all, baseMeta, 3);
+    expect(totals.monthlyIncome).toBeCloseTo(15000, 0);
+  });
+
+  it("monthlyOngoing = sum of ongoing entries / monthCount", () => {
+    const all = [
+      entry("2025-01-01", "ongoing", "20000"),
+      entry("2025-02-01", "ongoing", "20000"),
+    ];
+    const totals = computeTotals(all, all, baseMeta, 2);
+    expect(totals.monthlyOngoing).toBeCloseTo(20000, 0);
+  });
+
+  it("purchaseTotal always uses allEntries even when filteredEntries is empty", () => {
+    const allEntries = [entry("2024-01-01", "purchase", "500000")];
+    const totals = computeTotals([], allEntries, baseMeta, 1);
+    expect(totals.purchaseTotal).toBe(500000);
+  });
+
+  it("propertyEquity = currentPropertyValue - remainingMortgageBalance", () => {
+    const totals = computeTotals([], [], baseMeta, 1);
+    // currentValue=3200000, remaining≈2400000-principalPaid(~5mo)
+    expect(totals.propertyEquity).toBeGreaterThan(790000);
+    expect(totals.propertyEquity).toBeLessThan(820000);
+  });
+
+  it("propertyEquity falls back to purchasePrice - remainingBalance when no currentPropertyValue", () => {
+    const meta = { ...baseMeta, currentPropertyValue: null };
+    const totals = computeTotals([], [], meta, 1);
+    // purchasePrice=3000000, remaining≈2400000-principalPaid(~5mo)≈2380000 → equity≈620000
+    expect(totals.propertyEquity).toBeGreaterThan(590000);
+    expect(totals.propertyEquity).toBeLessThan(630000);
   });
 });

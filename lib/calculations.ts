@@ -1,4 +1,5 @@
 import type { Entry, Meta } from "@/db/schema";
+import { totalsToDate, type MortgageParams } from "./mortgage";
 
 export type Period = string; // "3m" | "6m" | "12m" | "2025" | "2026 YTD" | "all-time"
 
@@ -74,10 +75,15 @@ export function filterEntriesByPeriod(
   return { filtered: entries, monthCount: 1 };
 }
 
-export function computeTotals(entries: Entry[], meta: Meta): Totals {
-  const purchase = entries.filter((e) => e.section === "purchase");
-  const ongoing = entries.filter((e) => e.section === "ongoing");
-  const income = entries.filter((e) => e.section === "income");
+export function computeTotals(
+  filteredEntries: Entry[],
+  allEntries: Entry[],
+  meta: Meta,
+  monthCount: number
+): Totals {
+  const purchase = allEntries.filter((e) => e.section === "purchase");
+  const ongoing = filteredEntries.filter((e) => e.section === "ongoing");
+  const income = filteredEntries.filter((e) => e.section === "income");
 
   const sum = (arr: Entry[]) => arr.reduce((s, e) => s + Number(e.amount), 0);
 
@@ -85,24 +91,45 @@ export function computeTotals(entries: Entry[], meta: Meta): Totals {
   const ongoingTotal = sum(ongoing);
   const incomeTotal = sum(income);
 
-  const monthlyOngoing = sum(ongoing.filter((e) => e.recurring));
-  const monthlyIncome = sum(income.filter((e) => e.recurring));
-
+  const monthlyOngoing = monthCount > 0 ? sum(ongoing) / monthCount : 0;
+  const monthlyIncome = monthCount > 0 ? sum(income) / monthCount : 0;
   const netMonthly = monthlyIncome - monthlyOngoing;
   const annualNet = netMonthly * 12;
 
   const purchasePrice = Number(meta.purchasePrice);
-  const propertyEquity = purchasePrice - Number(meta.mortgageAmount);
+  const mortgageAmount = Number(meta.mortgageAmount);
+  const currentValue = Number(meta.currentPropertyValue ?? 0);
+
+  let principalPaid = 0;
+  if (
+    meta.mortgageStartDate &&
+    Number(meta.mortgageRate) > 0 &&
+    mortgageAmount > 0 &&
+    meta.mortgageTermYears > 0
+  ) {
+    const params: MortgageParams = {
+      principal: mortgageAmount,
+      annualRate: Number(meta.mortgageRate),
+      termYears: meta.mortgageTermYears,
+      startDate: meta.mortgageStartDate,
+    };
+    principalPaid = totalsToDate(params).principalPaid;
+  }
+  const remainingBalance = Math.max(0, mortgageAmount - principalPaid);
+  const baseValue = currentValue > 0 ? currentValue : purchasePrice;
+  const propertyEquity = baseValue - remainingBalance;
+
   const grossYield = purchasePrice ? (monthlyIncome * 12 / purchasePrice) * 100 : 0;
   const netYield = purchasePrice ? (annualNet / purchasePrice) * 100 : 0;
 
   const sizeM2 = Number(meta.sizeM2);
   const pricePerM2 = sizeM2 > 0 ? purchasePrice / sizeM2 : 0;
 
-  const currentValue = Number(meta.currentPropertyValue ?? 0);
   const appreciationCZK = currentValue > 0 ? currentValue - purchasePrice : 0;
-  const appreciationPct = purchasePrice > 0 && appreciationCZK !== 0
-    ? (appreciationCZK / purchasePrice) * 100 : 0;
+  const appreciationPct =
+    purchasePrice > 0 && appreciationCZK !== 0
+      ? (appreciationCZK / purchasePrice) * 100
+      : 0;
 
   return {
     purchaseTotal, ongoingTotal, incomeTotal,
