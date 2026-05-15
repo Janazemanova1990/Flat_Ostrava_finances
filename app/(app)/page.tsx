@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 
 import { db } from "@/db";
 import { entries, meta } from "@/db/schema";
-import { computeTotals } from "@/lib/calculations";
 import { Dashboard } from "@/components/dashboard/dashboard";
 
 export default async function DashboardPage() {
@@ -28,7 +27,5 @@ export default async function DashboardPage() {
     updatedAt: new Date(),
   };
 
-  const totals = computeTotals(allEntries, metaData);
-
-  return <Dashboard totals={totals} meta={metaData} entries={allEntries} />;
+  return <Dashboard meta={metaData} entries={allEntries} />;
 }
