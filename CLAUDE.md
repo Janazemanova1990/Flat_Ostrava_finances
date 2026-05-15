@@ -24,10 +24,15 @@ This file gives Claude Code the context it needs to work on this project. Read i
 - **File attachments:** multi-file upload per entry, stored in Vercel Blob (private). Edit form shows existing attachments with individual delete buttons. Blobs served via `/api/blob-download` proxy (token never exposed to browser). Verified working end-to-end locally.
 - **Notes field:** textarea with placeholder, saves correctly end-to-end
 - **UI polish (2026-05-14):** fonts changed to DM Serif Display (headings) + DM Sans (body); dashboard KPIs merged into one two-section card; entry rows redesigned (recurring = violet ↻ amount, tap-to-expand accordion with notes + file links, tax/attachment info on date line); property header tightened (chips + edit on one row, no redundant down payment pill); export buttons moved to footer; em dashes replaced with hyphens throughout UI; property name in DB updated to use hyphen.
+- **Full redesign (2026-05-15):** palette replaced with Navy/Teal/Coral on Cream (#1E3A4A / #3D8070 / #D4684A on #F5F0E8); headings font changed to Playfair Display; dashboard restructured (2-hero KPI strip + support tier, new text-first mortgage card with teal/coral progress bars, 3-col property value card, removed FinancingBreakdown/MiniStat); Add Entry button changed to coral; income amounts in teal, expense amounts in coral throughout.
+- **Period filter + chart (2026-05-15):** dashboard KPIs now scoped by period chips (3m / 6m / 12m / year / YTD / All-time); monthly figures use actual entry averages (sum/monthCount) instead of recurring-only; property equity formula corrected to `currentPropertyValue − remainingMortgageBalance`; Monthly Income vs Expenses bar chart added (recharts) below KPI card, responds to period filter; `computeTotals` signature changed to `(filteredEntries, allEntries, meta, monthCount)` — `purchaseTotal` always all-time, monthly figures period-scoped.
+- **Nav overhaul (2026-05-15):** tab nav expanded to 6 items (Dashboard, Purchase, Expenses, Inventární karta, Odpisy, Info); desktop nav is full-width; mobile shows hamburger dropdown; property header info chips removed (will move to dedicated section); placeholder pages added for Inventární karta (`/inventarni-karta`), Odpisy (`/odpisy`), Info (`/info`).
 
 ### What's next
-1. **Test in production** — smoke-test attachments and edit on Vercel after push
-2. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
+1. **Test in production** — smoke-test attachments, edit flow, period filter, and chart on Vercel after push
+2. **Build out** Inventární karta, Odpisy, Info pages
+3. **Monthly ledger** table on dashboard (Period / Income / Expenses / Net / Principal / Interest / Balance)
+4. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
 
 ### Known notes
 - `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname). `drizzle-kit migrate` uses this connection and may silently fail if it points to a different endpoint than the app. **Safe migration method:** use the Node script pattern that uses `DATABASE_URL` directly (see migration history below).
@@ -48,7 +53,7 @@ This file gives Claude Code the context it needs to work on this project. Read i
 - **`postcss.config.js`** — must be `.js` (CommonJS `module.exports`), NOT `.mjs`. Next.js silently ignores `.mjs` PostCSS configs.
 - **`tailwind.config.ts`** — content paths + CSS variable color mappings (needed for `bg-primary`, `text-foreground`, etc.).
 - **`globals.css`** — uses `@tailwind base/components/utilities` directives. CSS variables are HSL channel values (e.g. `--primary: 120 20% 30%`) not hex, so Tailwind opacity modifiers like `bg-primary/90` work.
-- App-specific colours (Sage & Blush palette) are in `lib/colours.ts` as hex values and applied as inline styles — they do NOT go through Tailwind classes.
+- App-specific colours (Navy/Teal/Coral on Cream palette) are in `lib/colours.ts` as hex values and applied as inline styles — they do NOT go through Tailwind classes.
 
 ---
 
@@ -125,7 +130,7 @@ A personal web app for Jana to track all finances related to her Ostrava flat pu
   /migrations/                  # SQL migration files
 /lib
   /constants.ts                 # Categories, CZK formatter, todayISO
-  /colours.ts                   # Sage & Blush colour token object (not Tailwind classes)
+  /colours.ts                   # Navy/Teal/Coral colour token object (not Tailwind classes)
   /auth.ts                      # Password check helper
   /mortgage.ts                  # Amortisation pure functions + Vitest tests
   /calculations.ts              # Yield, totals, pricePerM2, appreciation, daysUntilRateReset
@@ -152,39 +157,36 @@ A personal web app for Jana to track all finances related to her Ostrava flat pu
 
 ---
 
-## Aesthetic / design language — Sage & Blush
+## Aesthetic / design language — Navy, Teal & Coral on Cream
 
-The palette is **not** standard Tailwind colours. All colour values live in `/lib/colours.ts` and should be applied as inline styles or CSS variables — don't invent Tailwind class names for them.
+The palette is **not** standard Tailwind colours. All colour values live in `/lib/colours.ts` and should be applied as inline styles — don't invent Tailwind class names for them.
 
-| Role | Hex |
-|---|---|
-| Page background | `#f4f7f4` |
-| Background gradient (top-right, sage) | `rgba(134,179,134,0.15)` |
-| Background gradient (bottom-left, blush) | `rgba(210,169,169,0.12)` |
-| Card background | `white` |
-| Card border | `#d4e0d4` |
-| Primary text | `#2d3b2d` |
-| Primary action (buttons, active tab) | `#3d5c3d` |
-| Muted text / labels | `#8faa8f` |
-| Eyebrow / secondary text | `#5f7a5f` |
-| Income / positive | `#2d6a2d` |
-| Tax deductible accent | `#8b4a4a` |
-| Tax deductible bg | `#f5e8e8` |
-| Mortgage dark section bg | `#1c1917` |
-| Mortgage interest section bg | `#f5f3ff` |
-| Mortgage interest section border | `#ddd6fe` |
-| Mortgage interest accent | `#6d28d9` |
-| Rate notification bg | `#fffbeb` |
-| Rate notification border | `#fcd34d` |
+| Token | Hex | Role |
+|---|---|---|
+| `bg` | `#F5F0E8` | Page background (cream) |
+| `white` | `#FFFFFF` | Card background |
+| `border` | `#E2D9CC` | All borders |
+| `navy` | `#1E3A4A` | Primary text, structure, active tab |
+| `navyMid` | `rgba(30,58,74,0.5)` | Secondary text, muted labels |
+| `navyMuted` | `rgba(30,58,74,0.32)` | Placeholder, disabled |
+| `navy08` | `rgba(30,58,74,0.08)` | Subtle chip background |
+| `teal` | `#3D8070` | Income, positive numbers, equity, progress |
+| `teal10` | `rgba(61,128,112,0.1)` | Teal tint bg |
+| `coral` | `#D4684A` | Expenses, negative, Add entry button, warnings |
+| `coral10` | `rgba(212,104,74,0.1)` | Coral tint bg |
+| `coral20` | `rgba(212,104,74,0.18)` | Coral medium tint |
 
-- **Cards:** `background: white`, `border: 1px solid #d4e0d4`, `border-radius: 12px`.
-- **Input fields:** `background: #f4f7f4`, same border.
-- **Display headings:** Fraunces, medium weight.
-- **Body:** Inter, 13–14px.
+- **Cards:** `background: white`, `border: 1px solid #E2D9CC`, `border-radius: 12px`.
+- **Input fields:** `background: #F5F0E8`, `border: 1px solid #E2D9CC`.
+- **Display headings:** Playfair Display (variable `--font-fraunces`), weights 500/600.
+- **Body:** DM Sans (variable `--font-inter`), 14px.
 - **Money formatting:** `Intl.NumberFormat("cs-CZ", { style: "currency", currency: "CZK", maximumFractionDigits: 0 })`. Always `tabular-nums` for amounts.
-- **Recurring badge:** sage green pill (`↻ monthly`).
-- **Tax badge:** rose pill (`⊛ tax`).
-- **Invoice badge:** sage green pill (`📄 invoice`), clickable.
+- **Income amounts:** teal `#3D8070`.
+- **Expense amounts:** coral `#D4684A`.
+- **Add entry button:** coral background, white text.
+- **Active tab:** navy background `#1E3A4A`, cream text.
+- **Tax deductible:** coral accent `#D4684A`, coral10 background.
+- **Recurring indicator:** ↻ prefix, navy text weight.
 
 ---
 
@@ -373,7 +375,7 @@ Commit `.env.example` with placeholders. Never commit real values.
 - Single password, not OAuth or magic links.
 - CZK only.
 - No user accounts table.
-- Palette is Sage & Blush (custom hex values, not Tailwind colours) — do not revert to stone/purple prototype palette.
+- Palette is Navy/Teal/Coral on Cream (custom hex values, not Tailwind colours) — do not revert to Sage & Blush or stone/purple prototype palette.
 - Invoice attachment in v1 — `invoice_url`/`invoice_filename` on entries table (legacy single-file). New multi-file system uses the `attachments` table (FK → entries, ON DELETE CASCADE). Both coexist; new entries use `attachments`, old entries with `invoice_url` still display correctly via the blob-download proxy.
 - Tax-deductible is a boolean flag per entry, not a category or free-form tag.
 - Property appreciation is manual estimate only — Jana updates from Sreality.cz when she wants.
@@ -386,6 +388,6 @@ Commit `.env.example` with placeholders. Never commit real values.
 
 The Claude artifact prototype is in `/reference/flat_finance_tracker.jsx`. It has the exact categories, dashboard layout, KPI logic, and entry form structure that production should match.
 
-**Visual design exception:** The prototype uses a stone/purple palette. Production uses **Sage & Blush** as defined in the Aesthetic section above and the full design spec at `docs/superpowers/specs/2026-05-13-flat-finance-tracker-design.md`. Where the spec and prototype conflict on visuals, the spec wins.
+**Visual design exception:** The prototype uses a stone/purple palette. Production uses **Navy/Teal/Coral on Cream** as defined in the Aesthetic section above. Where the prototype conflicts on visuals, the Aesthetic section wins.
 
 The spec is also the authority for new features not in the prototype: invoice upload, tax-deductible flag, mortgage amortisation card, property appreciation card, rate reset banner, and price-per-m² display.
