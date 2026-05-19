@@ -55,10 +55,13 @@ export function totalsToDate(params: MortgageParams): {
 
   const start = new Date(startDate);
   const now = new Date();
+  const paymentDay = start.getDate();
+  const rawMonths =
+    (now.getFullYear() - start.getFullYear()) * 12 +
+    (now.getMonth() - start.getMonth());
   const monthsElapsed = Math.max(
     0,
-    (now.getFullYear() - start.getFullYear()) * 12 +
-      (now.getMonth() - start.getMonth())
+    now.getDate() >= paymentDay ? rawMonths + 1 : rawMonths
   );
 
   const r = annualRate / 12;

@@ -121,10 +121,18 @@ export function IncomeExpensesChart({ entries }: Props) {
           />
           <Tooltip cursor={{ fill: "rgba(30,58,74,0.04)" }} content={<CustomTooltip />} />
           <Legend
-            iconType="square"
-            iconSize={10}
-            wrapperStyle={{ fontSize: 12, color: "rgba(30,58,74,0.6)", paddingTop: 12 }}
-            formatter={(v) => v === "income" ? "Income" : "Expenses"}
+            content={() => (
+              <div style={{ display: "flex", justifyContent: "center", gap: 16, paddingTop: 12, fontSize: 12, color: "rgba(30,58,74,0.6)" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ display: "inline-block", width: 10, height: 10, background: "#3D8070", borderRadius: 2 }} />
+                  Income
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ display: "inline-block", width: 10, height: 10, background: "rgba(212,104,74,0.25)", borderRadius: 2 }} />
+                  Expenses
+                </span>
+              </div>
+            )}
           />
           <Bar dataKey="income" fill="#3D8070" radius={[3, 3, 0, 0]} />
           <Bar dataKey="expenses" fill="rgba(212,104,74,0.25)" radius={[3, 3, 0, 0]} />

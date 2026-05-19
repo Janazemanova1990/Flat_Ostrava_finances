@@ -20,17 +20,19 @@ export function MortgageCard({ params }: Props) {
   const M = monthlyPayment(params);
   const now = new Date();
   const start = new Date(params.startDate);
-  const monthsElapsed = Math.max(1,
-    (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth())
-  );
-  const split = paymentSplit(params, monthsElapsed);
+  const paymentDay = start.getDate();
+  const rawMonths =
+    (now.getFullYear() - start.getFullYear()) * 12 +
+    (now.getMonth() - start.getMonth());
+  const currentMonth = Math.max(1, now.getDate() >= paymentDay ? rawMonths + 1 : rawMonths);
+  const split = paymentSplit(params, currentMonth);
   const totals = totalsToDate(params);
   const n = params.termYears * 12;
   const remaining = params.principal - totals.principalPaid;
   const paidPct = Number(((totals.principalPaid / params.principal) * 100).toFixed(1));
   const interestPaidPct = Number(((totals.interestPaid / totals.totalProjectedInterest) * 100).toFixed(1));
-  const yearsLeft = Math.floor((n - monthsElapsed) / 12);
-  const moLeft = (n - monthsElapsed) % 12;
+  const yearsLeft = Math.floor((n - currentMonth) / 12);
+  const moLeft = (n - currentMonth) % 12;
 
   return (
     <div className="bg-white border border-[#E2D9CC] rounded-xl overflow-hidden">
