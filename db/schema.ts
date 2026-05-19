@@ -44,6 +44,14 @@ export const attachments = pgTable("attachments", {
   uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull().default(sql`now()`),
 });
 
+export const propertyValueHistory = pgTable("property_value_history", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  value: numeric("value", { precision: 12, scale: 2 }).notNull(),
+  pricePerM2: numeric("price_per_m2", { precision: 10, scale: 2 }),
+  recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().default(sql`now()`),
+});
+
+export type PropertyValueSnapshot = typeof propertyValueHistory.$inferSelect;
 export type Meta = typeof meta.$inferSelect;
 export type Entry = typeof entries.$inferSelect;
 export type NewEntry = typeof entries.$inferInsert;

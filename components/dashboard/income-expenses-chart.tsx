@@ -43,6 +43,38 @@ function fmtK(v: number) {
   return String(v);
 }
 
+function fmt(v: number) {
+  return `${v.toLocaleString("cs-CZ")} Kč`;
+}
+
+function CustomTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const income = payload.find((p: any) => p.dataKey === "income")?.value ?? 0;
+  const expenses = payload.find((p: any) => p.dataKey === "expenses")?.value ?? 0;
+  const net = income - expenses;
+  return (
+    <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "white", border: "1px solid #E2D9CC", boxShadow: "0 4px 16px rgba(30,58,74,0.10)", minWidth: 180 }}>
+      <div className="font-semibold mb-2" style={{ color: "#1E3A4A" }}>{label}</div>
+      <div className="space-y-1">
+        <div className="flex justify-between gap-6" style={{ color: "rgba(30,58,74,0.5)" }}>
+          <span>Income</span>
+          <span className="tabular-nums font-medium" style={{ color: "#3D8070" }}>{fmt(income)}</span>
+        </div>
+        <div className="flex justify-between gap-6" style={{ color: "rgba(30,58,74,0.5)" }}>
+          <span>Expenses</span>
+          <span className="tabular-nums font-medium" style={{ color: "#D4684A" }}>{fmt(expenses)}</span>
+        </div>
+        <div className="pt-1 mt-1 flex justify-between gap-6 font-semibold" style={{ borderTop: "1px solid #E2D9CC" }}>
+          <span style={{ color: "rgba(30,58,74,0.6)" }}>Net</span>
+          <span className="tabular-nums" style={{ color: net >= 0 ? "#3D8070" : "#D4684A" }}>
+            {net >= 0 ? "+" : ""}{fmt(net)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function IncomeExpensesChart({ entries }: Props) {
   const data = buildChartData(entries);
 
@@ -87,20 +119,7 @@ export function IncomeExpensesChart({ entries }: Props) {
             tickFormatter={fmtK}
             width={36}
           />
-          <Tooltip
-            cursor={{ fill: "rgba(30,58,74,0.04)" }}
-            contentStyle={{
-              border: "1px solid #E2D9CC",
-              borderRadius: 8,
-              fontSize: 12,
-              color: "#1E3A4A",
-              boxShadow: "0 2px 8px rgba(30,58,74,0.08)",
-            }}
-            formatter={(value, name) => [
-              `${Number(value).toLocaleString("cs-CZ")} Kč`,
-              name === "income" ? "Income" : "Expenses",
-            ]}
-          />
+          <Tooltip cursor={{ fill: "rgba(30,58,74,0.04)" }} content={<CustomTooltip />} />
           <Legend
             iconType="square"
             iconSize={10}

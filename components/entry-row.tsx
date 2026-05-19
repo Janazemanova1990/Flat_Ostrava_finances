@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2, Pencil, Paperclip, ChevronDown } from "lucide-react";
-import { fmtCZK } from "@/lib/constants";
+import { fmtCZK, fmtDate } from "@/lib/constants";
 import type { EntryWithAttachments } from "@/db/schema";
 
 type Props = {
@@ -63,7 +63,7 @@ export function EntryRow({ entry, color, onEdit }: Props) {
             )}
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{entry.date}</span>
+            <span className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{fmtDate(entry.date)}</span>
             {entry.taxDeductible && (
               <span className="text-xs" style={{ color: "#D4684A" }}>· ⊛ tax deductible</span>
             )}

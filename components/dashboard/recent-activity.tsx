@@ -1,4 +1,4 @@
-import { fmtCZK } from "@/lib/constants";
+import { fmtCZK, fmtDate } from "@/lib/constants";
 import type { Entry } from "@/db/schema";
 
 export function RecentActivity({ entries }: { entries: Entry[] }) {
@@ -24,7 +24,7 @@ export function RecentActivity({ entries }: { entries: Entry[] }) {
                 />
                 <div>
                   <div className="font-medium" style={{ color: "#1E3A4A" }}>{tx.description || tx.category}</div>
-                  <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{tx.category} · {tx.date}</div>
+                  <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{tx.category} · {fmtDate(tx.date)}</div>
                 </div>
               </div>
               <div className="font-medium tabular-nums" style={{ color: tx.section === "income" ? "#3D8070" : "#D4684A" }}>

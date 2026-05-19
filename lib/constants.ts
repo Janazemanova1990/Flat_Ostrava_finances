@@ -46,3 +46,13 @@ export const fmtCZK = (n: number | string | null | undefined): string =>
   }).format(Number(n) || 0);
 
 export const todayISO = (): string => new Date().toISOString().slice(0, 10);
+
+/** Formats any ISO date string "YYYY-MM-DD" or Date object → "DD.MM.YYYY" */
+export function fmtDate(value: string | Date | null | undefined): string {
+  if (!value) return "—";
+  if (value instanceof Date) {
+    return `${String(value.getDate()).padStart(2, "0")}.${String(value.getMonth() + 1).padStart(2, "0")}.${value.getFullYear()}`;
+  }
+  const [y, m, d] = value.slice(0, 10).split("-");
+  return `${d}.${m}.${y}`;
+}

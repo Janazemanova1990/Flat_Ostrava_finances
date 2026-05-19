@@ -6,6 +6,7 @@ import { MortgageCard } from "./mortgage-card";
 import { PropertyValueCard } from "./property-value-card";
 import { RecentActivity } from "./recent-activity";
 import { PeriodFilter } from "./period-filter";
+import { IncomeExpensesChart } from "./income-expenses-chart";
 import { fmtCZK } from "@/lib/constants";
 import {
   filterEntriesByPeriod,
@@ -13,12 +14,12 @@ import {
   daysUntilRateReset,
   type Period,
 } from "@/lib/calculations";
-import type { Entry, Meta } from "@/db/schema";
+import type { Entry, Meta, PropertyValueSnapshot } from "@/db/schema";
 import type { MortgageParams } from "@/lib/mortgage";
 
-type Props = { meta: Meta; entries: Entry[] };
+type Props = { meta: Meta; entries: Entry[]; valueHistory: PropertyValueSnapshot[] };
 
-export function Dashboard({ meta, entries }: Props) {
+export function Dashboard({ meta, entries, valueHistory }: Props) {
   const [selectedPeriod, setSelectedPeriod] = useState<Period>("all-time");
 
   const { filtered, monthCount } = useMemo(
@@ -125,68 +126,54 @@ export function Dashboard({ meta, entries }: Props) {
           className="grid grid-cols-3 divide-x border-t"
           style={{ background: "#F5F0E8", borderColor: "#E2D9CC" }}
         >
-          <div className="p-4 sm:p-5 flex items-center gap-3">
-            <div className="p-2 bg-white rounded-lg border border-[#E2D9CC]">
-              <KeyRound size={14} style={{ color: "rgba(30,58,74,0.5)" }} />
-            </div>
-            <div>
-              <div className="text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
-                Purchase costs
+          {[
+            {
+              icon: <KeyRound size={12} style={{ color: "rgba(30,58,74,0.5)" }} />,
+              label: "Purchase costs",
+              value: fmtCZK(totals.purchaseTotal),
+              color: "#1E3A4A",
+            },
+            {
+              icon: <TrendingUp size={12} style={{ color: "rgba(30,58,74,0.5)" }} />,
+              label: "Property value",
+              value: Number(meta.currentPropertyValue) > 0
+                ? fmtCZK(Number(meta.currentPropertyValue))
+                : "—",
+              color: "#1E3A4A",
+            },
+            {
+              icon: <ArrowDownCircle size={12} style={{ color: hasRent ? "#3D8070" : "rgba(30,58,74,0.5)" }} />,
+              label: "Net yield",
+              value: hasRent && purchasePrice > 0
+                ? `${totals.netYield.toFixed(2)} %`
+                : "—",
+              color: hasRent ? "#1E3A4A" : "rgba(30,58,74,0.32)",
+            },
+          ].map(({ icon, label, value, color }) => (
+            <div key={label} className="p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+              <div className="hidden sm:flex p-1.5 bg-white rounded-lg border border-[#E2D9CC] shrink-0">
+                {icon}
               </div>
-              <div
-                className="font-medium tabular-nums text-sm"
-                style={{ color: "#1E3A4A" }}
-              >
-                {fmtCZK(totals.purchaseTotal)}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 sm:p-5 flex items-center gap-3">
-            <div className="p-2 bg-white rounded-lg border border-[#E2D9CC]">
-              <TrendingUp size={14} style={{ color: "rgba(30,58,74,0.5)" }} />
-            </div>
-            <div>
-              <div className="text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
-                Property value
-              </div>
-              <div
-                className="font-medium tabular-nums text-sm"
-                style={{ color: "#1E3A4A" }}
-              >
-                {Number(meta.currentPropertyValue) > 0
-                  ? fmtCZK(Number(meta.currentPropertyValue))
-                  : "—"}
-              </div>
-            </div>
-          </div>
-
-          <div className="p-4 sm:p-5 flex items-center gap-3">
-            <div className="p-2 bg-white rounded-lg border border-[#E2D9CC]">
-              <ArrowDownCircle
-                size={14}
-                style={{ color: hasRent ? "#3D8070" : "rgba(30,58,74,0.5)" }}
-              />
-            </div>
-            <div>
-              <div className="text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
-                Net yield
-              </div>
-              <div
-                className="font-medium tabular-nums text-sm"
-                style={{ color: hasRent ? "#1E3A4A" : "rgba(30,58,74,0.32)" }}
-              >
-                {hasRent && purchasePrice > 0
-                  ? `${totals.netYield.toFixed(2)} %`
-                  : "—"}
+              <div className="min-w-0">
+                <div className="text-[9px] sm:text-[10px] leading-tight truncate" style={{ color: "rgba(30,58,74,0.5)" }}>
+                  {label}
+                </div>
+                <div
+                  className="font-medium tabular-nums text-xs sm:text-sm mt-0.5 truncate"
+                  style={{ color }}
+                >
+                  {value}
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
+      <IncomeExpensesChart entries={filtered} />
+
       <MortgageCard params={mortgageParams} />
-      <PropertyValueCard meta={meta} />
+      <PropertyValueCard meta={meta} history={valueHistory} />
       <RecentActivity entries={entries} />
     </div>
   );

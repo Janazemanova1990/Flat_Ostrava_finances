@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { meta } from "@/db/schema";
+import { meta, propertyValueHistory } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -36,5 +36,15 @@ export async function PATCH(request: Request) {
   }
 
   const [row] = await db.update(meta).set(updates).where(eq(meta.id, 1)).returning();
+
+  if (parsed.data.currentPropertyValue != null) {
+    const sizeM2 = Number(row.sizeM2) || 0;
+    const value = parsed.data.currentPropertyValue;
+    await db.insert(propertyValueHistory).values({
+      value: String(value),
+      pricePerM2: sizeM2 > 0 ? String(Math.round(value / sizeM2)) : null,
+    });
+  }
+
   return NextResponse.json({ meta: row });
 }

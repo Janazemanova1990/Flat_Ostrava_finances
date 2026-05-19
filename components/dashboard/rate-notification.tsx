@@ -1,6 +1,7 @@
 "use client";
 import { Bell } from "lucide-react";
 import { useState } from "react";
+import { fmtDate } from "@/lib/constants";
 
 type Props = { daysUntil: number; rate: number; fixedUntil: string; onUpdateRate: () => void };
 
@@ -8,7 +9,7 @@ export function RateNotification({ daysUntil, rate, fixedUntil, onUpdateRate }: 
   const [dismissed, setDismissed] = useState(false);
   if (dismissed) return null;
 
-  const month = new Date(fixedUntil).toLocaleDateString("cs-CZ", { month: "long", year: "numeric" });
+  const month = fmtDate(fixedUntil);
 
   return (
     <div className="flex items-center gap-3 rounded-xl p-4" style={{ background: "#FFF8F5", border: "1px solid rgba(212,104,74,0.3)" }}>
