@@ -13,18 +13,18 @@ export function PropertyValueCard({ meta, history }: Props) {
   const router = useRouter();
 
   const purchasePrice = Number(meta.purchasePrice);
-  const currentValue = Number(meta.currentPropertyValue ?? 0);
   const sizeM2 = Number(meta.sizeM2) || 59;
-  const hasEstimate = currentValue > 0;
-  const gainCZK = currentValue - purchasePrice;
-  const gainPct = purchasePrice > 0 ? (gainCZK / purchasePrice) * 100 : 0;
+  const hasEstimate = history.length > 0;
+  const latestValue = hasEstimate ? Number(history[0].value) : 0;
+  const gainCZK = hasEstimate ? latestValue - purchasePrice : 0;
+  const gainPct = hasEstimate && purchasePrice > 0 ? (gainCZK / purchasePrice) * 100 : 0;
   const color = gainCZK >= 0 ? "#3D8070" : "#D4684A";
 
   const parsedPpm2 = Number(pricePerM2.replace(/\s/g, ""));
   const calculatedTotal = parsedPpm2 > 0 ? Math.round(parsedPpm2 * sizeM2) : 0;
 
   function openEdit() {
-    const ppm2 = currentValue > 0 ? Math.round(currentValue / sizeM2) : 0;
+    const ppm2 = latestValue > 0 ? Math.round(latestValue / sizeM2) : 0;
     setPricePerM2(ppm2 > 0 ? String(ppm2) : "");
     setEditing(true);
   }
