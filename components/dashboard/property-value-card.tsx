@@ -7,6 +7,21 @@ import type { Meta, PropertyValueSnapshot } from "@/db/schema";
 
 type Props = { meta: Meta; history: PropertyValueSnapshot[] };
 
+const COL4 = "1fr 1fr 1fr auto";
+
+function ActionButtons({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {
+  return (
+    <div className="flex items-center gap-0.5 pl-2">
+      <button onClick={onEdit} className="p-1 rounded" style={{ color: "rgba(30,58,74,0.4)" }}>
+        <Pencil size={12} />
+      </button>
+      <button onClick={onDelete} className="p-1 rounded" style={{ color: "#D4684A" }}>
+        <Trash2 size={12} />
+      </button>
+    </div>
+  );
+}
+
 function HistoryRow({
   snap, sizeM2, onRefresh,
 }: { snap: PropertyValueSnapshot; sizeM2: number; onRefresh: () => void }) {
@@ -56,20 +71,74 @@ function HistoryRow({
   }
 
   return (
-    <div className="grid items-center text-sm tabular-nums group" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
+    <div className="grid items-center text-sm tabular-nums" style={{ gridTemplateColumns: COL4 }}>
       <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(snap.recordedAt)}</span>
       <span className="text-center" style={{ color: "#1E3A4A" }}>
         {snap.pricePerM2 ? `${fmtCZK(Number(snap.pricePerM2))}/m²` : ""}
       </span>
-      <div className="flex items-center justify-end gap-1">
-        <span className="font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
-        <button onClick={() => setEditMode(true)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded ml-1" style={{ color: "rgba(30,58,74,0.4)" }}>
-          <Pencil size={12} />
-        </button>
-        <button onClick={remove} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded" style={{ color: "#D4684A" }}>
-          <Trash2 size={12} />
-        </button>
+      <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
+      <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+    </div>
+  );
+}
+
+function PurchaseRow({
+  meta, sizeM2, onRefresh,
+}: { meta: Meta; sizeM2: number; onRefresh: () => void }) {
+  const [editMode, setEditMode] = useState(false);
+  const purchasePrice = Number(meta.purchasePrice);
+  const [price, setPrice] = useState(String(purchasePrice));
+
+  const parsed = Number(price.replace(/\s/g, ""));
+
+  async function save() {
+    if (!parsed) return;
+    await fetch("/api/meta", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ purchasePrice: parsed }),
+    });
+    setEditMode(false);
+    onRefresh();
+  }
+
+  async function remove() {
+    if (!confirm("Clear purchase price?")) return;
+    await fetch("/api/meta", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ purchasePrice: 0 }),
+    });
+    onRefresh();
+  }
+
+  if (editMode) {
+    return (
+      <div className="flex items-center gap-2 py-1">
+        <span className="text-sm tabular-nums" style={{ color: "rgba(30,58,74,0.45)", minWidth: 80 }}>{fmtDate(meta.mortgageStartDate)}</span>
+        <input
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          placeholder="Purchase price"
+          className="flex-1 rounded-lg px-2 py-1 text-sm outline-none"
+          style={{ background: "#F5F0E8", border: "1px solid #E2D9CC", color: "#1E3A4A" }}
+          autoFocus
+        />
+        <button onClick={save} disabled={!parsed} className="text-xs font-medium px-3 py-1 rounded-lg disabled:opacity-40" style={{ background: "#1E3A4A", color: "#F5F0E8" }}>Save</button>
+        <button onClick={() => setEditMode(false)} className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>Cancel</button>
       </div>
+    );
+  }
+
+  return (
+    <div className="grid items-center text-sm tabular-nums" style={{ gridTemplateColumns: COL4 }}>
+      <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(meta.mortgageStartDate)}</span>
+      <span className="text-center" style={{ color: "#1E3A4A" }}>
+        {sizeM2 > 0 ? `${fmtCZK(Math.round(purchasePrice / sizeM2))}/m²` : ""}
+      </span>
+      <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
+      <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
     </div>
   );
 }
@@ -98,18 +167,18 @@ export function PropertyValueCard({ meta, history }: Props) {
 
   async function saveEstimate() {
     if (!calculatedTotal) return;
-    await fetch("/api/meta", {
-      method: "PATCH",
+    await fetch("/api/property-value-history", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPropertyValue: calculatedTotal }),
+      body: JSON.stringify({ value: calculatedTotal, pricePerM2: parsedPpm2 > 0 ? parsedPpm2 : null }),
     });
     setEditing(false);
     router.refresh();
   }
 
   return (
-    <div className="bg-white border border-[#E2D9CC] rounded-xl p-4 sm:p-6">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white border border-[#E2D9CC] rounded-xl overflow-hidden">
+      <div className="flex justify-between items-center px-5 sm:px-6 pt-5 pb-4" style={{ borderBottom: "1px solid rgba(30,58,74,0.08)" }}>
         <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "#1E3A4A" }}>Property value</span>
         {!editing && (
           <button onClick={openEdit} className="text-xs rounded-lg px-3 py-1 transition-colors" style={{ color: "#3D8070", border: "1px solid #E2D9CC" }}>
@@ -119,7 +188,7 @@ export function PropertyValueCard({ meta, history }: Props) {
       </div>
 
       {editing ? (
-        <div className="space-y-3">
+        <div className="px-5 sm:px-6 py-5 space-y-3">
           <div>
             <label className="text-[10px] uppercase tracking-wider block mb-1" style={{ color: "rgba(30,58,74,0.5)" }}>
               Price per m² (Kč)
@@ -146,24 +215,27 @@ export function PropertyValueCard({ meta, history }: Props) {
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
-          {/* Gain hero — % first (smaller), then amount */}
+        <div className="px-5 sm:px-6 py-5 space-y-3">
+          {/* Gain hero — aligned to same 4-col grid */}
           {hasEstimate && (
             <>
-              <div className="flex items-center gap-3">
-                {gainCZK >= 0 ? <ArrowUp size={18} style={{ color }} /> : <ArrowDown size={18} style={{ color }} />}
-                <span className="font-display text-lg font-medium tabular-nums" style={{ color }}>
+              <div className="grid items-center tabular-nums" style={{ gridTemplateColumns: COL4 }}>
+                <div className="flex items-center">
+                  {gainCZK >= 0 ? <ArrowUp size={16} style={{ color }} /> : <ArrowDown size={16} style={{ color }} />}
+                </div>
+                <span className="text-center font-sans text-lg font-semibold" style={{ color }}>
                   {gainPct >= 0 ? "+" : ""}{gainPct.toFixed(1)}%
                 </span>
-                <span className="font-display text-2xl font-medium tabular-nums" style={{ color }}>
+                <span className="text-right font-sans text-xl font-semibold" style={{ color }}>
                   {gainCZK >= 0 ? "+" : ""}{fmtCZK(gainCZK)}
                 </span>
+                <div />
               </div>
               <div style={{ borderTop: "1px solid #E2D9CC" }} />
             </>
           )}
 
-          {/* History rows — newest first, with edit/delete on hover */}
+          {/* History rows */}
           {hasEstimate && (
             <div className="space-y-2">
               {history.map((snap) => (
@@ -173,14 +245,8 @@ export function PropertyValueCard({ meta, history }: Props) {
             </div>
           )}
 
-          {/* Purchase row — always visible, no edit/delete */}
-          <div className="grid text-sm tabular-nums" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
-            <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(meta.mortgageStartDate)}</span>
-            <span className="text-center" style={{ color: "#1E3A4A" }}>
-              {sizeM2 > 0 ? `${fmtCZK(Math.round(purchasePrice / sizeM2))}/m²` : ""}
-            </span>
-            <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
-          </div>
+          {/* Purchase row */}
+          <PurchaseRow meta={meta} sizeM2={sizeM2} onRefresh={() => router.refresh()} />
 
           {!hasEstimate && (
             <p className="text-xs" style={{ color: "rgba(30,58,74,0.45)" }}>

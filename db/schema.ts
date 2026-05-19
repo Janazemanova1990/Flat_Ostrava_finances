@@ -12,8 +12,6 @@ export const meta = pgTable("meta", {
   mortgageTermYears: integer("mortgage_term_years").notNull().default(30),
   mortgageStartDate: date("mortgage_start_date"),
   mortgageRateFixedUntil: date("mortgage_rate_fixed_until"),
-  currentPropertyValue: numeric("current_property_value", { precision: 12, scale: 2 }),
-  currentPropertyValueUpdatedAt: timestamp("current_property_value_updated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(sql`now()`),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().default(sql`now()`),
 });

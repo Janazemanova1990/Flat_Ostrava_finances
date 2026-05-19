@@ -23,8 +23,6 @@ export default async function DashboardPage() {
     mortgageTermYears: 30,
     mortgageStartDate: null,
     mortgageRateFixedUntil: null,
-    currentPropertyValue: null,
-    currentPropertyValueUpdatedAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

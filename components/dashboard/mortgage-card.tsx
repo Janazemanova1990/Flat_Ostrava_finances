@@ -65,7 +65,7 @@ export function MortgageCard({ params }: Props) {
 
       {/* Monthly payment row */}
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 sm:px-6 py-4" style={{ borderBottom: "1px solid rgba(30,58,74,0.08)" }}>
-        <span className="font-display tabular-nums" style={{ fontSize: "1.75rem", fontWeight: 500, color: "#1E3A4A" }}>
+        <span className="font-sans tabular-nums" style={{ fontSize: "1.75rem", fontWeight: 600, color: "#1E3A4A" }}>
           {fmtCZK(M)}
         </span>
         <span className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>/ month</span>

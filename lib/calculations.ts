@@ -79,7 +79,8 @@ export function computeTotals(
   filteredEntries: Entry[],
   allEntries: Entry[],
   meta: Meta,
-  monthCount: number
+  monthCount: number,
+  latestPropertyValue?: number
 ): Totals {
   const purchase = allEntries.filter((e) => e.section === "purchase");
   const ongoing = filteredEntries.filter((e) => e.section === "ongoing");
@@ -98,7 +99,7 @@ export function computeTotals(
 
   const purchasePrice = Number(meta.purchasePrice);
   const mortgageAmount = Number(meta.mortgageAmount);
-  const currentValue = Number(meta.currentPropertyValue ?? 0);
+  const currentValue = latestPropertyValue ?? 0;
 
   let principalPaid = 0;
   if (

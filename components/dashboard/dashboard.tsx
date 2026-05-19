@@ -27,9 +27,11 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
     [entries, selectedPeriod]
   );
 
+  const latestPropertyValue = valueHistory.length > 0 ? Number(valueHistory[0].value) : undefined;
+
   const totals = useMemo(
-    () => computeTotals(filtered, entries, meta, monthCount),
-    [filtered, entries, meta, monthCount]
+    () => computeTotals(filtered, entries, meta, monthCount, latestPropertyValue),
+    [filtered, entries, meta, monthCount, latestPropertyValue]
   );
 
   const daysUntilReset = daysUntilRateReset(meta.mortgageRateFixedUntil ?? null);
@@ -81,7 +83,7 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
             {purchasePrice > 0 ? (
               <>
                 <div
-                  className="font-display tabular-nums mb-1"
+                  className="font-sans tabular-nums mb-1"
                   style={{ fontSize: "2rem", fontWeight: 600, color: "#3D8070" }}
                 >
                   {fmtCZK(totals.propertyEquity)}
@@ -106,7 +108,7 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
               Net monthly cash flow
             </div>
             <div
-              className="font-display tabular-nums mb-1"
+              className="font-sans tabular-nums mb-1"
               style={{
                 fontSize: "2rem",
                 fontWeight: 600,
@@ -136,9 +138,7 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
             {
               icon: <TrendingUp size={12} style={{ color: "rgba(30,58,74,0.5)" }} />,
               label: "Property value",
-              value: Number(meta.currentPropertyValue) > 0
-                ? fmtCZK(Number(meta.currentPropertyValue))
-                : "—",
+              value: fmtCZK(valueHistory.length > 0 ? Number(valueHistory[0].value) : purchasePrice),
               color: "#1E3A4A",
             },
             {

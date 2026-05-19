@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { meta, propertyValueHistory } from "@/db/schema";
+import { meta } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -14,7 +14,6 @@ const MetaPatch = z.object({
   mortgageTermYears: z.coerce.number().int().optional(),
   mortgageStartDate: z.string().nullable().optional(),
   mortgageRateFixedUntil: z.string().nullable().optional(),
-  currentPropertyValue: z.coerce.number().nullable().optional(),
 });
 
 export async function GET() {
@@ -31,20 +30,6 @@ export async function PATCH(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 });
 
   const updates: Record<string, unknown> = { ...parsed.data, updatedAt: new Date() };
-  if (parsed.data.currentPropertyValue != null) {
-    updates.currentPropertyValueUpdatedAt = new Date();
-  }
-
   const [row] = await db.update(meta).set(updates).where(eq(meta.id, 1)).returning();
-
-  if (parsed.data.currentPropertyValue != null) {
-    const sizeM2 = Number(row.sizeM2) || 0;
-    const value = parsed.data.currentPropertyValue;
-    await db.insert(propertyValueHistory).values({
-      value: String(value),
-      pricePerM2: sizeM2 > 0 ? String(Math.round(value / sizeM2)) : null,
-    });
-  }
-
   return NextResponse.json({ meta: row });
 }

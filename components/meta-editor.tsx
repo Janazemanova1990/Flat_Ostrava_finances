@@ -16,7 +16,6 @@ export function MetaEditor({ meta, onClose }: { meta: Meta; onClose: () => void 
     mortgageTermYears: String(meta.mortgageTermYears),
     mortgageStartDate: meta.mortgageStartDate ?? "",
     mortgageRateFixedUntil: meta.mortgageRateFixedUntil ?? "",
-    currentPropertyValue: meta.currentPropertyValue ? String(meta.currentPropertyValue) : "",
   });
 
   async function save() {
@@ -57,7 +56,6 @@ export function MetaEditor({ meta, onClose }: { meta: Meta; onClose: () => void 
         {field("Mortgage term (years)", "mortgageTermYears", "number")}
         {field("Mortgage start date", "mortgageStartDate", "date")}
         {field("Fixed rate until", "mortgageRateFixedUntil", "date")}
-        <div className="col-span-2">{field("Current property estimate (Kč)", "currentPropertyValue", "number")}</div>
       </div>
       <div className="flex gap-2">
         <button

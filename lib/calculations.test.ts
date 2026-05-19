@@ -114,8 +114,6 @@ const baseMeta: Meta = {
   mortgageTermYears: 30,
   mortgageStartDate: "2025-12-01",
   mortgageRateFixedUntil: null,
-  currentPropertyValue: "3200000",
-  currentPropertyValueUpdatedAt: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -146,16 +144,15 @@ describe("computeTotals", () => {
     expect(totals.purchaseTotal).toBe(500000);
   });
 
-  it("propertyEquity = currentPropertyValue - remainingMortgageBalance", () => {
-    const totals = computeTotals([], [], baseMeta, 1);
-    // currentValue=3200000, remaining≈2400000-principalPaid(~5mo)
+  it("propertyEquity = latestPropertyValue - remainingMortgageBalance", () => {
+    const totals = computeTotals([], [], baseMeta, 1, 3200000);
+    // latestValue=3200000, remaining≈2400000-principalPaid(~5mo)
     expect(totals.propertyEquity).toBeGreaterThan(790000);
     expect(totals.propertyEquity).toBeLessThan(820000);
   });
 
-  it("propertyEquity falls back to purchasePrice - remainingBalance when no currentPropertyValue", () => {
-    const meta = { ...baseMeta, currentPropertyValue: null };
-    const totals = computeTotals([], [], meta, 1);
+  it("propertyEquity falls back to purchasePrice - remainingBalance when no latestPropertyValue", () => {
+    const totals = computeTotals([], [], baseMeta, 1);
     // purchasePrice=3000000, remaining≈2400000-principalPaid(~5mo)≈2380000 → equity≈620000
     expect(totals.propertyEquity).toBeGreaterThan(590000);
     expect(totals.propertyEquity).toBeLessThan(630000);
