@@ -56,18 +56,20 @@ function HistoryRow({
   }
 
   return (
-    <div className="flex items-center gap-2 text-sm tabular-nums group">
+    <div className="grid items-center text-sm tabular-nums group" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
       <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(snap.recordedAt)}</span>
-      {snap.pricePerM2 && (
-        <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtCZK(Number(snap.pricePerM2))}/m²</span>
-      )}
-      <span className="font-medium ml-auto" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
-      <button onClick={() => setEditMode(true)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded" style={{ color: "rgba(30,58,74,0.4)" }}>
-        <Pencil size={12} />
-      </button>
-      <button onClick={remove} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded" style={{ color: "#D4684A" }}>
-        <Trash2 size={12} />
-      </button>
+      <span className="text-center" style={{ color: "#1E3A4A" }}>
+        {snap.pricePerM2 ? `${fmtCZK(Number(snap.pricePerM2))}/m²` : ""}
+      </span>
+      <div className="flex items-center justify-end gap-1">
+        <span className="font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
+        <button onClick={() => setEditMode(true)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded ml-1" style={{ color: "rgba(30,58,74,0.4)" }}>
+          <Pencil size={12} />
+        </button>
+        <button onClick={remove} className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded" style={{ color: "#D4684A" }}>
+          <Trash2 size={12} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -143,41 +145,49 @@ export function PropertyValueCard({ meta, history }: Props) {
             <button onClick={() => setEditing(false)} className="px-3 py-2 rounded-lg text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>Cancel</button>
           </div>
         </div>
-      ) : hasEstimate ? (
+      ) : (
         <div className="space-y-3">
           {/* Gain hero — % first (smaller), then amount */}
-          <div className="flex items-center gap-3">
-            {gainCZK >= 0 ? <ArrowUp size={18} style={{ color }} /> : <ArrowDown size={18} style={{ color }} />}
-            <span className="font-display text-lg font-medium tabular-nums" style={{ color }}>
-              {gainPct >= 0 ? "+" : ""}{gainPct.toFixed(1)}%
-            </span>
-            <span className="font-display text-2xl font-medium tabular-nums" style={{ color }}>
-              {gainCZK >= 0 ? "+" : ""}{fmtCZK(gainCZK)}
-            </span>
-          </div>
-
-          <div style={{ borderTop: "1px solid #E2D9CC" }} />
+          {hasEstimate && (
+            <>
+              <div className="flex items-center gap-3">
+                {gainCZK >= 0 ? <ArrowUp size={18} style={{ color }} /> : <ArrowDown size={18} style={{ color }} />}
+                <span className="font-display text-lg font-medium tabular-nums" style={{ color }}>
+                  {gainPct >= 0 ? "+" : ""}{gainPct.toFixed(1)}%
+                </span>
+                <span className="font-display text-2xl font-medium tabular-nums" style={{ color }}>
+                  {gainCZK >= 0 ? "+" : ""}{fmtCZK(gainCZK)}
+                </span>
+              </div>
+              <div style={{ borderTop: "1px solid #E2D9CC" }} />
+            </>
+          )}
 
           {/* History rows — newest first, with edit/delete on hover */}
-          <div className="space-y-2">
-            {history.map((snap) => (
-              <HistoryRow key={snap.id} snap={snap} sizeM2={sizeM2} onRefresh={() => router.refresh()} />
-            ))}
-          </div>
+          {hasEstimate && (
+            <div className="space-y-2">
+              {history.map((snap) => (
+                <HistoryRow key={snap.id} snap={snap} sizeM2={sizeM2} onRefresh={() => router.refresh()} />
+              ))}
+              <div style={{ borderTop: "1px solid #E2D9CC" }} />
+            </div>
+          )}
 
-          <div style={{ borderTop: "1px solid #E2D9CC" }} />
-
-          {/* Purchase row — static */}
-          <div className="flex items-center gap-2 text-sm tabular-nums">
+          {/* Purchase row — always visible, no edit/delete */}
+          <div className="grid text-sm tabular-nums" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
             <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(meta.mortgageStartDate)}</span>
-            {sizeM2 > 0 && <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtCZK(Math.round(purchasePrice / sizeM2))}/m²</span>}
-            <span className="font-medium ml-auto" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
+            <span className="text-center" style={{ color: "#1E3A4A" }}>
+              {sizeM2 > 0 ? `${fmtCZK(Math.round(purchasePrice / sizeM2))}/m²` : ""}
+            </span>
+            <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
           </div>
+
+          {!hasEstimate && (
+            <p className="text-xs" style={{ color: "rgba(30,58,74,0.45)" }}>
+              No estimate yet — click "Add estimate" to track appreciation.
+            </p>
+          )}
         </div>
-      ) : (
-        <p className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
-          No estimate yet. Add a current market value from Sreality.cz to track appreciation.
-        </p>
       )}
     </div>
   );

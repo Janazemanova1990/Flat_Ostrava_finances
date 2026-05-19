@@ -11,28 +11,31 @@ This file gives Claude Code the context it needs to work on this project. Read i
 ### What's done
 - Full Next.js 15 app scaffold with all pages, API routes, and dashboard
 - Auth: single-password middleware, Web Crypto HMAC cookie (`lib/auth.ts`)
-- DB: Drizzle schema + migrations applied to Neon. Two migrations exist:
+- DB: Drizzle schema + migrations applied to Neon. Three migrations exist:
   - `0000_opposite_killraven` — initial schema (entries, meta)
-  - `0001_add_attachments` — attachments table (applied manually via Node script, see migration notes below)
-- All API routes: entries CRUD, meta, upload, export (JSON/CSV/tax-ZIP), import, attachments, blob-download proxy
+  - `0001_add_attachments` — attachments table
+  - `0002_property_value_history` — property value history table (applied via Node script)
+- All API routes: entries CRUD, meta, upload, export (JSON/CSV/tax-ZIP), import, attachments, blob-download proxy, property-value-history PATCH/DELETE
 - All UI: property header, tab nav, meta editor, entry forms, dashboard, entry edit, file attachments
 - 8/8 mortgage calculator tests passing
 - Tailwind v3 + PostCSS properly wired up (see CSS notes below)
 - Mobile layout fixed for 375–430px viewports (iPhone SE → iPhone 16 Pro) — no left-side clipping on iOS Safari
-- Tab nav: icon-only on mobile (`hidden sm:inline` labels), full labels on desktop
 - **Entry editing:** pencil icon on each row opens pre-filled form, saves via PATCH
-- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private). Edit form shows existing attachments with individual delete buttons. Blobs served via `/api/blob-download` proxy (token never exposed to browser). Verified working end-to-end locally.
+- **File attachments:** multi-file upload per entry, stored in Vercel Blob (private). Edit form shows existing attachments with individual delete buttons. Blobs served via `/api/blob-download` proxy (token never exposed to browser).
 - **Notes field:** textarea with placeholder, saves correctly end-to-end
-- **UI polish (2026-05-14):** fonts changed to DM Serif Display (headings) + DM Sans (body); dashboard KPIs merged into one two-section card; entry rows redesigned (recurring = violet ↻ amount, tap-to-expand accordion with notes + file links, tax/attachment info on date line); property header tightened (chips + edit on one row, no redundant down payment pill); export buttons moved to footer; em dashes replaced with hyphens throughout UI; property name in DB updated to use hyphen.
-- **Full redesign (2026-05-15):** palette replaced with Navy/Teal/Coral on Cream (#1E3A4A / #3D8070 / #D4684A on #F5F0E8); headings font changed to Playfair Display; dashboard restructured (2-hero KPI strip + support tier, new text-first mortgage card with teal/coral progress bars, 3-col property value card, removed FinancingBreakdown/MiniStat); Add Entry button changed to coral; income amounts in teal, expense amounts in coral throughout.
-- **Period filter + chart (2026-05-15):** dashboard KPIs now scoped by period chips (3m / 6m / 12m / year / YTD / All-time); monthly figures use actual entry averages (sum/monthCount) instead of recurring-only; property equity formula corrected to `currentPropertyValue − remainingMortgageBalance`; Monthly Income vs Expenses bar chart added (recharts) below KPI card, responds to period filter; `computeTotals` signature changed to `(filteredEntries, allEntries, meta, monthCount)` — `purchaseTotal` always all-time, monthly figures period-scoped.
-- **Nav overhaul (2026-05-15):** tab nav expanded to 6 items (Dashboard, Purchase, Expenses, Inventární karta, Odpisy, Info); desktop nav is full-width; mobile shows hamburger dropdown; property header info chips removed (will move to dedicated section); placeholder pages added for Inventární karta (`/inventarni-karta`), Odpisy (`/odpisy`), Info (`/info`).
+- **Full redesign (2026-05-15):** palette replaced with Navy/Teal/Coral on Cream (#1E3A4A / #3D8070 / #D4684A on #F5F0E8); headings font changed to Playfair Display; dashboard restructured (2-hero KPI strip + support tier, mortgage card, property value card); income amounts in teal, expense amounts in coral throughout.
+- **Period filter + chart:** dashboard KPIs scoped by period chips (3m / 6m / 12m / year / YTD / All-time); Monthly Income vs Expenses bar chart with custom tooltip (Income / Expenses / Net); `computeTotals` signature `(filteredEntries, allEntries, meta, monthCount)`.
+- **Nav overhaul (2026-05-15):** tab nav 6 items (Dashboard, Purchase, Expenses, Inventární karta, Odpisy, Info); desktop nav full-width horizontal bar; mobile hamburger moved into property header (top-right of eyebrow row); TabNav is desktop-only.
+- **Property header:** edit button removed; hamburger in header triggers mobile dropdown nav; no chips.
+- **Mortgage card (2026-05-19):** info tooltip (ⓘ) shows rate/term/payoff date replacing header meta; large payment row (amount + principal/interest breakdown); thick progress bars; `x% paid` only below bars.
+- **Property value card (2026-05-19):** gain hero (% smaller + amount larger); history table — each estimate saved as a new row in `property_value_history`, never overwrites; inline edit/delete per row (icons on hover); purchase row always visible at bottom; estimate input via price/m² with live total preview.
+- **Date formatting:** `fmtDate()` in `lib/constants.ts` — all dates DD.MM.YYYY across the whole app.
+- **Support tier (mobile):** icons hidden on mobile, stacked layout, smaller text to fit 3 columns.
 
 ### What's next
-1. **Test in production** — smoke-test attachments, edit flow, period filter, and chart on Vercel after push
-2. **Build out** Inventární karta, Odpisy, Info pages
-3. **Monthly ledger** table on dashboard (Period / Income / Expenses / Net / Principal / Interest / Balance)
-4. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
+1. **Build out** Inventární karta, Odpisy, Info pages
+2. **Monthly ledger** table on dashboard (Period / Income / Expenses / Net / Principal / Interest / Balance)
+3. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
 
 ### Known notes
 - `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname). `drizzle-kit migrate` uses this connection and may silently fail if it points to a different endpoint than the app. **Safe migration method:** use the Node script pattern that uses `DATABASE_URL` directly (see migration history below).
@@ -47,6 +50,7 @@ This file gives Claude Code the context it needs to work on this project. Read i
 |---|---|---|
 | `0000_opposite_killraven.sql` | ✓ | `pnpm db:migrate` |
 | `0001_add_attachments.sql` | ✓ | Node script via `DATABASE_URL` (drizzle-kit used wrong endpoint) |
+| `0002_property_value_history.sql` | ✓ | Node script via `DATABASE_URL` |
 
 ### CSS / Tailwind setup (hard-won — do not revert)
 - **Tailwind v3** (`tailwindcss@^3.4`) — NOT v4. shadcn/ui components were generated for v3 and are incompatible with v4.
