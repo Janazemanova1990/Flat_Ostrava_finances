@@ -1,13 +1,13 @@
 import { db } from "@/db";
 import { entries, attachments } from "@/db/schema";
-import { eq, desc, inArray } from "drizzle-orm";
-import { EntrySection } from "@/components/entry-section";
+import { desc, inArray, or, eq } from "drizzle-orm";
+import { CombinedExpensesSection } from "@/components/combined-expenses-section";
 
 export const dynamic = "force-dynamic";
 
 export default async function ExpensesPage() {
   const rows = await db.select().from(entries)
-    .where(eq(entries.section, "ongoing"))
+    .where(or(eq(entries.section, "ongoing"), eq(entries.section, "purchase")))
     .orderBy(desc(entries.date));
 
   const ids = rows.map((e) => e.id);
@@ -20,13 +20,5 @@ export default async function ExpensesPage() {
     attachments: attachmentRows.filter((a) => a.entryId === e.id),
   }));
 
-  return (
-    <EntrySection
-      title="Ongoing expenses"
-      subtitle="Monthly and ad-hoc costs - mortgage, SVJ, utilities, repairs. Flag the recurring ones and mark tax-deductible entries for your accountant."
-      section="ongoing"
-      entries={entriesWithAttachments}
-      color="sage"
-    />
-  );
+  return <CombinedExpensesSection entries={entriesWithAttachments} />;
 }

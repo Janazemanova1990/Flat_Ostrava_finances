@@ -9,9 +9,10 @@ type Props = {
   entry: EntryWithAttachments;
   color: "sage" | "income";
   onEdit: () => void;
+  showSectionBadge?: boolean;
 };
 
-export function EntryRow({ entry, color, onEdit }: Props) {
+export function EntryRow({ entry, color, onEdit, showSectionBadge }: Props) {
   const router = useRouter();
   const [expanded, setExpanded] = useState(false);
 
@@ -22,11 +23,7 @@ export function EntryRow({ entry, color, onEdit }: Props) {
   }
 
   const isRecurring = entry.recurring;
-  const amountColor = isRecurring
-    ? "#1E3A4A"
-    : color === "income"
-    ? "#3D8070"
-    : "#D4684A";
+  const amountColor = color === "income" ? "#3D8070" : "#D4684A";
 
   const allAttachments = [
     ...(entry.invoiceUrl
@@ -38,63 +35,69 @@ export function EntryRow({ entry, color, onEdit }: Props) {
   const hasDetail = !!entry.notes || allAttachments.length > 0;
 
   return (
-    <div className="px-5 py-3">
-      <div className="flex items-center justify-between gap-4">
-        <button
-          className="flex-1 min-w-0 text-left"
-          onClick={() => hasDetail && setExpanded((v) => !v)}
-        >
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm font-medium truncate" style={{ color: "#1E3A4A" }}>
+    <div className="px-4 sm:px-5 py-3">
+      {/* Main row */}
+      <div className="flex items-center justify-between gap-3">
+        {/* Left: date + tags, then name + attachments */}
+        <div className="flex-1 min-w-0">
+          {/* Line 1: date + tags */}
+          <div className="flex items-center gap-1.5 flex-wrap mb-1">
+            <span className="text-xs tabular-nums" style={{ color: "rgba(30,58,74,0.45)" }}>
+              {fmtDate(entry.date)}
+            </span>
+            {entry.taxDeductible && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide" style={{ background: "rgba(212,104,74,0.1)", color: "#D4684A" }}>
+                tax
+              </span>
+            )}
+            {showSectionBadge && entry.section === "purchase" && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide" style={{ background: "rgba(30,58,74,0.08)", color: "rgba(30,58,74,0.5)" }}>
+                purchase
+              </span>
+            )}
+          </div>
+          {/* Line 2: name + attachments + expand */}
+          <button
+            className="flex items-center gap-1.5 text-left w-full"
+            onClick={() => hasDetail && setExpanded((v) => !v)}
+          >
+            <span className="text-sm font-semibold truncate" style={{ color: "#1E3A4A" }}>
               {entry.description || entry.category}
             </span>
             {allAttachments.length > 0 && (
-              <span className="flex items-center gap-0.5 shrink-0" style={{ color: "rgba(30,58,74,0.5)" }}>
+              <span className="flex items-center gap-0.5 shrink-0" style={{ color: "rgba(30,58,74,0.45)" }}>
                 <Paperclip size={11} />
-                <span className="text-sm">{allAttachments.length}</span>
+                <span className="text-xs">{allAttachments.length}</span>
               </span>
             )}
             {hasDetail && (
               <ChevronDown
                 size={12}
                 className={`shrink-0 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-                style={{ color: "rgba(30,58,74,0.5)" }}
+                style={{ color: "rgba(30,58,74,0.4)" }}
               />
             )}
-          </div>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>{fmtDate(entry.date)}</span>
-            {entry.taxDeductible && (
-              <span className="text-sm" style={{ color: "#D4684A" }}>· ⊛ tax deductible</span>
-            )}
-          </div>
-        </button>
+          </button>
+        </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-sm font-medium tabular-nums" style={{ color: amountColor }}>
-            {isRecurring && <span className="mr-1">↻</span>}{fmtCZK(Number(entry.amount))}
+        {/* Right: price + actions */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <span className="text-sm font-semibold tabular-nums" style={{ color: amountColor }}>
+            {isRecurring && <span className="mr-0.5 text-xs" style={{ color: "rgba(30,58,74,0.4)" }}>↻</span>}
+            {fmtCZK(Number(entry.amount))}
           </span>
-          <button
-            onClick={onEdit}
-            className="p-1 rounded transition-colors"
-            style={{ color: "rgba(30,58,74,0.4)" }}
-            title="Edit"
-          >
+          <button onClick={onEdit} className="p-1 rounded" style={{ color: "rgba(30,58,74,0.35)" }} title="Edit">
             <Pencil size={13} />
           </button>
-          <button
-            onClick={handleDelete}
-            className="p-1 rounded transition-colors"
-            style={{ color: "rgba(30,58,74,0.4)" }}
-            title="Delete"
-          >
+          <button onClick={handleDelete} className="p-1 rounded" style={{ color: "rgba(30,58,74,0.35)" }} title="Delete">
             <Trash2 size={13} />
           </button>
         </div>
       </div>
 
+      {/* Expanded detail */}
       {expanded && hasDetail && (
-        <div className="mt-2 pt-2 space-y-2" style={{ borderTop: "1px solid #E2D9CC" }}>
+        <div className="mt-2 pt-2 space-y-1.5" style={{ borderTop: "1px solid #E2D9CC" }}>
           {entry.notes && (
             <p className="text-sm" style={{ color: "rgba(30,58,74,0.6)" }}>{entry.notes}</p>
           )}
@@ -106,7 +109,7 @@ export function EntryRow({ entry, color, onEdit }: Props) {
                   href={`/api/blob-download?url=${encodeURIComponent(a.blobUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-sm transition-colors"
+                  className="flex items-center gap-1.5 text-sm"
                   style={{ color: "#3D8070" }}
                 >
                   <Paperclip size={11} />

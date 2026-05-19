@@ -10,7 +10,7 @@ This file gives Claude Code the context it needs to work on this project. Read i
 
 ### What's done
 - Full Next.js 15 app scaffold with all pages, API routes, and dashboard
-- Auth: single-password middleware, Web Crypto HMAC cookie (`lib/auth.ts`)
+- Auth: single-password middleware, Web Crypto HMAC cookie (`lib/auth.ts`). Login uses `window.location.href` (not `router.push`) for hard redirect after auth so middleware sees the cookie immediately.
 - DB: Drizzle schema + migrations applied to Neon. Three migrations exist:
   - `0000_opposite_killraven` — initial schema (entries, meta)
   - `0001_add_attachments` — attachments table
@@ -25,19 +25,23 @@ This file gives Claude Code the context it needs to work on this project. Read i
 - **Notes field:** textarea with placeholder, saves correctly end-to-end
 - **Full redesign (2026-05-15):** palette replaced with Navy/Teal/Coral on Cream (#1E3A4A / #3D8070 / #D4684A on #F5F0E8); headings font changed to Playfair Display; dashboard restructured (2-hero KPI strip + support tier, mortgage card, property value card); income amounts in teal, expense amounts in coral throughout.
 - **Period filter + chart:** dashboard KPIs scoped by period chips (3m / 6m / 12m / year / YTD / All-time); Monthly Income vs Expenses bar chart with custom tooltip (Income / Expenses / Net); `computeTotals` signature `(filteredEntries, allEntries, meta, monthCount, latestPropertyValue?)`.
-- **Nav overhaul (2026-05-15):** tab nav 6 items (Dashboard, Purchase, Expenses, Inventární karta, Odpisy, Info); desktop nav full-width horizontal bar; mobile hamburger moved into property header (top-right of eyebrow row); TabNav is desktop-only.
+- **Nav (2026-05-19):** 6 tabs — Dashboard, Expenses, Income, Inventární karta, Odpisy, Info. Purchase tab removed; `/purchase` redirects to `/expenses`. Desktop nav full-width horizontal bar; mobile hamburger in property header.
 - **Property header:** edit button removed; hamburger in header triggers mobile dropdown nav; no chips.
-- **Mortgage card (2026-05-19):** info tooltip (ⓘ) shows rate/term/payoff date replacing header meta; large payment row (amount + principal/interest breakdown); thick progress bars; `x% paid` only below bars.
-- **Property value card (2026-05-19):** gain hero (% + amount) aligned to 4-column grid (date | Kč/m² | value | actions); history table — each estimate saved via POST `/api/property-value-history`, never overwrites meta; inline edit/delete always visible per row; purchase row editable with same buttons; estimate input via price/m² with live total preview.
+- **Mortgage card:** info tooltip (ⓘ) shows rate/term/payoff date; large payment row; on mobile P/I breakdown shows as 2 stacked rows below the amount. Payoff date formatted DD.MM.YYYY.
+- **Property value card:** gain hero (% + amount) — on mobile % sits next to arrow, amount on right; history rows — on mobile 2-line layout (date line 1, prices line 2); desktop 4-col grid unchanged.
 - **Property value source of truth:** `property_value_history` table only. `meta.current_property_value` and `meta.current_property_value_updated_at` columns have been dropped from DB and schema. `computeTotals` accepts `latestPropertyValue?: number` as 5th param — caller passes `history[0]?.value`.
 - **Date formatting:** `fmtDate()` in `lib/constants.ts` — all dates DD.MM.YYYY across the whole app.
-- **Support tier (mobile):** icons hidden on mobile, stacked layout, smaller text to fit 3 columns.
-- **KPI numbers font:** all large dashboard numbers use `font-sans` (DM Sans), not `font-display` (Playfair Display).
+- **KPI numbers font:** all large numbers use `font-sans` (DM Sans), not `font-display` (Playfair Display). Grand totals on Expenses/Income pages are navy, `font-sans`.
+- **Monthly Ledger (dashboard):** `components/dashboard/monthly-ledger.tsx` — shows N months (grows 1 row/month from first entry date, caps at 6). Columns: Period / Income / Expenses / Net / Principal / Interest / Balance. P/I/Balance from amortisation calc; no mortgage columns if params not set.
+- **Entry row redesign:** Line 1 = date (muted) + `tax` pill (coral) + `purchase` pill (navy, expenses page only). Line 2 = bold name + attachment count + expand arrow | amount + ↻ + edit/delete.
+- **Expenses page:** `CombinedExpensesSection` — fetches both `purchase` and `ongoing` entries, grouped by month (cream header + coral subtotal). Add form has Ongoing/Purchase tag toggle at top. Purchase entries show a `purchase` badge on the row.
+- **Income page:** `IncomeSection` — flat list grouped by month (cream header + teal subtotal). Add income button is teal.
+- **Tax deductible:** available on all entry types including purchase costs.
+- **Support tier (mobile):** centered layout, icons hidden.
 
 ### What's next
 1. **Build out** Inventární karta, Odpisy, Info pages
-2. **Monthly ledger** table on dashboard (Period / Income / Expenses / Net / Principal / Interest / Balance)
-3. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
+2. **Optional:** add custom domain `flat.nextfemai.com` via Vercel Settings → Domains → add CNAME pointing to `cname.vercel-dns.com`
 
 ### Known notes
 - `DATABASE_URL_UNPOOLED` currently points to the pooled Neon URL (has `-pooler` in hostname). `drizzle-kit migrate` uses this connection and may silently fail if it points to a different endpoint than the app. **Safe migration method:** use the Node script pattern that uses `DATABASE_URL` directly (see migration history below).
@@ -107,26 +111,29 @@ A personal web app for Jana to track all finances related to her Ostrava flat pu
   /(app)
     /layout.tsx                 # Auth-protected layout, property header
     /page.tsx                   # Dashboard (default tab)
-    /purchase/page.tsx          # Fetches entries + attachments, passes EntryWithAttachments[]
-    /expenses/page.tsx
-    /income/page.tsx
+    /purchase/page.tsx          # Redirects to /expenses
+    /expenses/page.tsx          # Fetches purchase + ongoing entries → CombinedExpensesSection
+    /income/page.tsx            # Fetches income entries → IncomeSection
   /globals.css
   /layout.tsx                   # Root layout (fonts, metadata)
 /components
   /ui/*                         # shadcn/ui primitives
-  /entry-section.tsx            # List + add/edit form, manages editingEntry state
+  /entry-section.tsx            # Legacy grouped list (still used internally)
+  /combined-expenses-section.tsx# Expenses page: purchase+ongoing merged, grouped by month
+  /income-section.tsx           # Income page: flat list grouped by month
   /entry-form.tsx               # Add or edit entry (entry? prop = edit mode), multi-file upload
-  /entry-row.tsx                # Row with pencil+trash icons, attachment chips
+  /entry-row.tsx                # Row: line1=date+tags, line2=bold name+attachments | amount+actions
   /category-group.tsx           # Groups rows by category, passes onEdit through
   /invoice-upload.tsx           # Single invoice drop zone (legacy), links via /api/blob-download
   /meta-editor.tsx
-  /property-header.tsx          # Global header: name, chips, edit button, export buttons
+  /property-header.tsx          # Global header + mobile hamburger nav
   /dashboard
     /dashboard.tsx
     /kpi-card.tsx
     /mini-stat.tsx
     /financing-breakdown.tsx
-    /mortgage-card.tsx          # Dark property section + lavender interest section
+    /mortgage-card.tsx
+    /monthly-ledger.tsx         # Month-by-month table: Income/Expenses/Net/Principal/Interest/Balance
     /property-value-card.tsx
     /recent-activity.tsx
     /rate-notification.tsx      # Amber banner, shown ≤60 days before rate reset

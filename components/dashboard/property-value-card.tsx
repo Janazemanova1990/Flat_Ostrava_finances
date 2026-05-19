@@ -71,13 +71,29 @@ function HistoryRow({
   }
 
   return (
-    <div className="grid items-center text-sm tabular-nums" style={{ gridTemplateColumns: COL4 }}>
-      <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(snap.recordedAt)}</span>
-      <span className="text-center" style={{ color: "#1E3A4A" }}>
-        {snap.pricePerM2 ? `${fmtCZK(Number(snap.pricePerM2))}/m²` : ""}
-      </span>
-      <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
-      <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+    <div>
+      {/* Mobile: 2-line */}
+      <div className="sm:hidden text-sm tabular-nums">
+        <div style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(snap.recordedAt)}</div>
+        <div className="flex items-center justify-between mt-0.5">
+          <span style={{ color: "rgba(30,58,74,0.6)" }}>
+            {snap.pricePerM2 ? `${fmtCZK(Number(snap.pricePerM2))}/m²` : ""}
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
+            <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+          </div>
+        </div>
+      </div>
+      {/* Desktop: 4-col grid */}
+      <div className="hidden sm:grid items-center text-sm tabular-nums" style={{ gridTemplateColumns: COL4 }}>
+        <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(snap.recordedAt)}</span>
+        <span className="text-center" style={{ color: "#1E3A4A" }}>
+          {snap.pricePerM2 ? `${fmtCZK(Number(snap.pricePerM2))}/m²` : ""}
+        </span>
+        <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(Number(snap.value))}</span>
+        <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+      </div>
     </div>
   );
 }
@@ -132,13 +148,29 @@ function PurchaseRow({
   }
 
   return (
-    <div className="grid items-center text-sm tabular-nums" style={{ gridTemplateColumns: COL4 }}>
-      <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(meta.mortgageStartDate)}</span>
-      <span className="text-center" style={{ color: "#1E3A4A" }}>
-        {sizeM2 > 0 ? `${fmtCZK(Math.round(purchasePrice / sizeM2))}/m²` : ""}
-      </span>
-      <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
-      <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+    <div>
+      {/* Mobile: 2-line */}
+      <div className="sm:hidden text-sm tabular-nums">
+        <div style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(meta.mortgageStartDate)}</div>
+        <div className="flex items-center justify-between mt-0.5">
+          <span style={{ color: "rgba(30,58,74,0.6)" }}>
+            {sizeM2 > 0 ? `${fmtCZK(Math.round(purchasePrice / sizeM2))}/m²` : ""}
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
+            <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+          </div>
+        </div>
+      </div>
+      {/* Desktop: 4-col grid */}
+      <div className="hidden sm:grid items-center text-sm tabular-nums" style={{ gridTemplateColumns: COL4 }}>
+        <span style={{ color: "rgba(30,58,74,0.45)" }}>{fmtDate(meta.mortgageStartDate)}</span>
+        <span className="text-center" style={{ color: "#1E3A4A" }}>
+          {sizeM2 > 0 ? `${fmtCZK(Math.round(purchasePrice / sizeM2))}/m²` : ""}
+        </span>
+        <span className="text-right font-medium" style={{ color: "#1E3A4A" }}>{fmtCZK(purchasePrice)}</span>
+        <ActionButtons onEdit={() => setEditMode(true)} onDelete={remove} />
+      </div>
     </div>
   );
 }
@@ -219,7 +251,20 @@ export function PropertyValueCard({ meta, history }: Props) {
           {/* Gain hero — aligned to same 4-col grid */}
           {hasEstimate && (
             <>
-              <div className="grid items-center tabular-nums" style={{ gridTemplateColumns: COL4 }}>
+              {/* Mobile gain hero */}
+              <div className="flex items-center justify-between tabular-nums sm:hidden">
+                <div className="flex items-center gap-1.5">
+                  {gainCZK >= 0 ? <ArrowUp size={16} style={{ color }} /> : <ArrowDown size={16} style={{ color }} />}
+                  <span className="font-sans text-lg font-semibold" style={{ color }}>
+                    {gainPct >= 0 ? "+" : ""}{gainPct.toFixed(1)}%
+                  </span>
+                </div>
+                <span className="font-sans text-xl font-semibold" style={{ color }}>
+                  {gainCZK >= 0 ? "+" : ""}{fmtCZK(gainCZK)}
+                </span>
+              </div>
+              {/* Desktop gain hero */}
+              <div className="hidden sm:grid items-center tabular-nums" style={{ gridTemplateColumns: COL4 }}>
                 <div className="flex items-center">
                   {gainCZK >= 0 ? <ArrowUp size={16} style={{ color }} /> : <ArrowDown size={16} style={{ color }} />}
                 </div>
@@ -247,12 +292,6 @@ export function PropertyValueCard({ meta, history }: Props) {
 
           {/* Purchase row */}
           <PurchaseRow meta={meta} sizeM2={sizeM2} onRefresh={() => router.refresh()} />
-
-          {!hasEstimate && (
-            <p className="text-xs" style={{ color: "rgba(30,58,74,0.45)" }}>
-              No estimate yet — click "Add estimate" to track appreciation.
-            </p>
-          )}
         </div>
       )}
     </div>

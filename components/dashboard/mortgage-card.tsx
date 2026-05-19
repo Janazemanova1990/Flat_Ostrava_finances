@@ -40,11 +40,11 @@ export function MortgageCard({ params }: Props) {
         <div className="relative">
           <button
             onClick={() => setTip((v) => !v)}
-            className="flex items-center justify-center rounded-full"
-            style={{ width: 16, height: 16, border: "1px solid #E2D9CC", color: "rgba(30,58,74,0.5)" }}
+            className="flex items-center justify-center"
+            style={{ color: "rgba(30,58,74,0.5)" }}
             aria-label="Mortgage details"
           >
-            <Info size={9} />
+            <Info size={16} />
           </button>
           {tip && (
             <div
@@ -56,7 +56,7 @@ export function MortgageCard({ params }: Props) {
                 {params.mortgageRateFixedUntil && (
                   <div>Fixed until <span className="font-semibold" style={{ color: "#1E3A4A" }}>{fmtDate(params.mortgageRateFixedUntil)}</span></div>
                 )}
-                <div>{params.termYears} years · payoff <span className="font-semibold" style={{ color: "#1E3A4A" }}>{totals.payoffDate}</span></div>
+                <div>{params.termYears} years · payoff <span className="font-semibold" style={{ color: "#1E3A4A" }}>{fmtDate(totals.payoffDate)}</span></div>
               </div>
             </div>
           )}
@@ -64,18 +64,30 @@ export function MortgageCard({ params }: Props) {
       </div>
 
       {/* Monthly payment row */}
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 sm:px-6 py-4" style={{ borderBottom: "1px solid rgba(30,58,74,0.08)" }}>
-        <span className="font-sans tabular-nums" style={{ fontSize: "1.75rem", fontWeight: 600, color: "#1E3A4A" }}>
-          {fmtCZK(M)}
-        </span>
-        <span className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>/ month</span>
-        <span className="ml-auto text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
-          <span className="tabular-nums font-semibold" style={{ color: "#3D8070" }}>{fmtCZK(split.principal)}</span>
-          {" "}→ your property
-          <span className="mx-1.5">·</span>
-          <span className="tabular-nums font-semibold" style={{ color: "#D4684A" }}>{fmtCZK(split.interest)}</span>
-          {" "}→ interest
-        </span>
+      <div className="px-5 sm:px-6 py-4" style={{ borderBottom: "1px solid rgba(30,58,74,0.08)" }}>
+        <div className="flex items-baseline gap-3">
+          <span className="font-sans tabular-nums" style={{ fontSize: "1.75rem", fontWeight: 600, color: "#1E3A4A" }}>
+            {fmtCZK(M)}
+          </span>
+          <span className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>/ month</span>
+          <span className="hidden sm:inline ml-auto text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <span className="tabular-nums font-semibold" style={{ color: "#3D8070" }}>{fmtCZK(split.principal)}</span>
+            {" "}→ your property
+            <span className="mx-1.5">·</span>
+            <span className="tabular-nums font-semibold" style={{ color: "#D4684A" }}>{fmtCZK(split.interest)}</span>
+            {" "}→ interest
+          </span>
+        </div>
+        <div className="mt-1 space-y-0.5 sm:hidden">
+          <div className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <span className="tabular-nums font-semibold" style={{ color: "#3D8070" }}>{fmtCZK(split.principal)}</span>
+            {" "}→ your property
+          </div>
+          <div className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <span className="tabular-nums font-semibold" style={{ color: "#D4684A" }}>{fmtCZK(split.interest)}</span>
+            {" "}→ interest
+          </div>
+        </div>
       </div>
 
       {/* Progress sections */}

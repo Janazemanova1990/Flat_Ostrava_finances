@@ -72,7 +72,7 @@ export function EntryForm({ section, entry, onSave, onCancel }: Props) {
   }
 
   const showRecurring = section !== "purchase";
-  const showTax = section !== "purchase";
+  const showTax = true;
 
   async function uploadFiles(entryId: string) {
     for (let i = 0; i < pendingFiles.length; i++) {

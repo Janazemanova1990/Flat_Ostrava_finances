@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { entries, attachments } from "@/db/schema";
 import { eq, desc, inArray } from "drizzle-orm";
-import { EntrySection } from "@/components/entry-section";
+import { IncomeSection } from "@/components/income-section";
 
 export const dynamic = "force-dynamic";
 
@@ -20,13 +20,5 @@ export default async function IncomePage() {
     attachments: attachmentRows.filter((a) => a.entryId === e.id),
   }));
 
-  return (
-    <EntrySection
-      title="Income"
-      subtitle="Rent, deposits, reimbursements. Flag recurring rent for yield calculations."
-      section="income"
-      entries={entriesWithAttachments}
-      color="income"
-    />
-  );
+  return <IncomeSection entries={entriesWithAttachments} />;
 }

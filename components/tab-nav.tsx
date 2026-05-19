@@ -1,15 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TrendingUp, KeyRound, Receipt, FileText, BarChart2, Info } from "lucide-react";
+import { TrendingUp, Receipt, ArrowDownCircle, FileText, BarChart2, Info } from "lucide-react";
 
 const tabs = [
-  { href: "/",                  label: "Dashboard",        icon: TrendingUp },
-  { href: "/purchase",          label: "Purchase",         icon: KeyRound   },
-  { href: "/expenses",          label: "Expenses",         icon: Receipt    },
-  { href: "/inventarni-karta",  label: "Inventární karta", icon: FileText   },
-  { href: "/odpisy",            label: "Odpisy",           icon: BarChart2  },
-  { href: "/info",              label: "Info",             icon: Info       },
+  { href: "/",                  label: "Dashboard",        icon: TrendingUp      },
+  { href: "/expenses",          label: "Expenses",         icon: Receipt         },
+  { href: "/income",            label: "Income",           icon: ArrowDownCircle },
+  { href: "/inventarni-karta",  label: "Inventární karta", icon: FileText        },
+  { href: "/odpisy",            label: "Odpisy",           icon: BarChart2       },
+  { href: "/info",              label: "Info",             icon: Info            },
 ];
 
 export function TabNav() {

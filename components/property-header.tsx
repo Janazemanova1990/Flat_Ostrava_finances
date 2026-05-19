@@ -2,16 +2,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Menu, X, TrendingUp, KeyRound, Receipt, FileText, BarChart2, Info } from "lucide-react";
+import { Home, Menu, X, TrendingUp, Receipt, ArrowDownCircle, FileText, BarChart2, Info } from "lucide-react";
 import type { Meta } from "@/db/schema";
 
 const tabs = [
-  { href: "/",               label: "Dashboard",        icon: TrendingUp },
-  { href: "/purchase",       label: "Purchase",         icon: KeyRound   },
-  { href: "/expenses",       label: "Expenses",         icon: Receipt    },
-  { href: "/inventarni-karta", label: "Inventární karta", icon: FileText },
-  { href: "/odpisy",         label: "Odpisy",           icon: BarChart2  },
-  { href: "/info",           label: "Info",             icon: Info       },
+  { href: "/",                  label: "Dashboard",        icon: TrendingUp      },
+  { href: "/expenses",          label: "Expenses",         icon: Receipt         },
+  { href: "/income",            label: "Income",           icon: ArrowDownCircle },
+  { href: "/inventarni-karta",  label: "Inventární karta", icon: FileText        },
+  { href: "/odpisy",            label: "Odpisy",           icon: BarChart2       },
+  { href: "/info",              label: "Info",             icon: Info            },
 ];
 
 export function PropertyHeader({ meta }: { meta: Meta }) {

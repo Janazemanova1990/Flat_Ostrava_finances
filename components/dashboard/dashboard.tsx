@@ -151,11 +151,11 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
               color: hasRent ? "#1E3A4A" : "rgba(30,58,74,0.32)",
             },
           ].map(({ icon, label, value, color }) => (
-            <div key={label} className="p-3 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:gap-3">
+            <div key={label} className="p-3 sm:p-5 flex flex-col items-center sm:flex-row sm:items-center sm:gap-3">
               <div className="hidden sm:flex p-1.5 bg-white rounded-lg border border-[#E2D9CC] shrink-0">
                 {icon}
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 text-center sm:text-left">
                 <div className="text-[11px] sm:text-xs leading-tight truncate" style={{ color: "rgba(30,58,74,0.5)" }}>
                   {label}
                 </div>
