@@ -190,7 +190,7 @@ export function PropertyValueCard({ meta, history }: Props) {
       {editing ? (
         <div className="px-5 sm:px-6 py-5 space-y-3">
           <div>
-            <label className="text-[10px] uppercase tracking-wider block mb-1" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <label className="text-xs uppercase tracking-wider block mb-1" style={{ color: "rgba(30,58,74,0.5)" }}>
               Price per m² (Kč)
             </label>
             <input

@@ -36,7 +36,7 @@ export function MortgageCard({ params }: Props) {
     <div className="bg-white border border-[#E2D9CC] rounded-xl overflow-hidden">
       {/* Card header */}
       <div className="flex items-center gap-2 px-5 sm:px-6 pt-5 pb-4" style={{ borderBottom: "1px solid rgba(30,58,74,0.08)" }}>
-        <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "#1E3A4A" }}>Mortgage payoff</span>
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "#1E3A4A" }}>Mortgage payoff</span>
         <div className="relative">
           <button
             onClick={() => setTip((v) => !v)}
@@ -69,7 +69,7 @@ export function MortgageCard({ params }: Props) {
           {fmtCZK(M)}
         </span>
         <span className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>/ month</span>
-        <span className="ml-auto text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
+        <span className="ml-auto text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
           <span className="tabular-nums font-semibold" style={{ color: "#3D8070" }}>{fmtCZK(split.principal)}</span>
           {" "}→ your property
           <span className="mx-1.5">·</span>
@@ -84,7 +84,7 @@ export function MortgageCard({ params }: Props) {
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <span className="text-sm font-semibold" style={{ color: "#1E3A4A" }}>Principal paid</span>
-            <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <div className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
               <span className="tabular-nums font-semibold" style={{ color: "#3D8070" }}>{fmtCZK(totals.principalPaid)}</span>
               {" "}of {fmtCZK(remaining)}
             </div>
@@ -92,7 +92,7 @@ export function MortgageCard({ params }: Props) {
           <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(61,128,112,0.12)" }}>
             <div className="h-full rounded-full" style={{ width: `${Math.max(0.5, paidPct)}%`, background: "#3D8070" }} />
           </div>
-          <p className="mt-1.5 text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
+          <p className="mt-1.5 text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
             {paidPct}% paid
           </p>
         </div>
@@ -101,7 +101,7 @@ export function MortgageCard({ params }: Props) {
         <div>
           <div className="flex items-baseline justify-between mb-2">
             <span className="text-sm font-semibold" style={{ color: "#1E3A4A" }}>Interest paid</span>
-            <div className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
+            <div className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>
               <span className="tabular-nums font-semibold" style={{ color: "#D4684A" }}>{fmtCZK(totals.interestPaid)}</span>
               {" "}of {fmtCZK(totals.totalProjectedInterest)}
             </div>
@@ -109,7 +109,7 @@ export function MortgageCard({ params }: Props) {
           <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(212,104,74,0.12)" }}>
             <div className="h-full rounded-full" style={{ width: `${Math.max(0.5, interestPaidPct)}%`, background: "#D4684A" }} />
           </div>
-          <p className="mt-1.5 text-[10px]" style={{ color: "rgba(30,58,74,0.5)" }}>
+          <p className="mt-1.5 text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>
             {interestPaidPct}% paid
           </p>
         </div>

@@ -5,6 +5,7 @@ import { RateNotification } from "./rate-notification";
 import { MortgageCard } from "./mortgage-card";
 import { PropertyValueCard } from "./property-value-card";
 import { RecentActivity } from "./recent-activity";
+import { MonthlyLedger } from "./monthly-ledger";
 import { PeriodFilter } from "./period-filter";
 import { IncomeExpensesChart } from "./income-expenses-chart";
 import { fmtCZK } from "@/lib/constants";
@@ -75,7 +76,7 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
           {/* Property equity */}
           <div className="p-5 sm:p-6">
             <div
-              className="text-[10px] uppercase tracking-widest font-bold mb-3"
+              className="text-xs uppercase tracking-widest font-bold mb-3"
               style={{ color: "rgba(30,58,74,0.5)" }}
             >
               Property equity
@@ -102,7 +103,7 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
           {/* Net monthly cash flow */}
           <div className="p-5 sm:p-6">
             <div
-              className="text-[10px] uppercase tracking-widest font-bold mb-3"
+              className="text-xs uppercase tracking-widest font-bold mb-3"
               style={{ color: "rgba(30,58,74,0.5)" }}
             >
               Net monthly cash flow
@@ -155,11 +156,11 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
                 {icon}
               </div>
               <div className="min-w-0">
-                <div className="text-[9px] sm:text-[10px] leading-tight truncate" style={{ color: "rgba(30,58,74,0.5)" }}>
+                <div className="text-[11px] sm:text-xs leading-tight truncate" style={{ color: "rgba(30,58,74,0.5)" }}>
                   {label}
                 </div>
                 <div
-                  className="font-medium tabular-nums text-xs sm:text-sm mt-0.5 truncate"
+                  className="font-medium tabular-nums text-sm mt-0.5 truncate"
                   style={{ color }}
                 >
                   {value}
@@ -174,6 +175,7 @@ export function Dashboard({ meta, entries, valueHistory }: Props) {
 
       <MortgageCard params={mortgageParams} />
       <PropertyValueCard meta={meta} history={valueHistory} />
+      <MonthlyLedger entries={entries} meta={meta} />
       <RecentActivity entries={entries} />
     </div>
   );

@@ -21,7 +21,7 @@ function LoginForm() {
     });
     setLoading(false);
     if (res.ok) {
-      router.push(params.get("next") ?? "/");
+      window.location.href = params.get("next") ?? "/";
     } else {
       setError("Wrong password");
     }

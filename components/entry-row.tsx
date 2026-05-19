@@ -51,7 +51,7 @@ export function EntryRow({ entry, color, onEdit }: Props) {
             {allAttachments.length > 0 && (
               <span className="flex items-center gap-0.5 shrink-0" style={{ color: "rgba(30,58,74,0.5)" }}>
                 <Paperclip size={11} />
-                <span className="text-xs">{allAttachments.length}</span>
+                <span className="text-sm">{allAttachments.length}</span>
               </span>
             )}
             {hasDetail && (
@@ -63,9 +63,9 @@ export function EntryRow({ entry, color, onEdit }: Props) {
             )}
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-xs" style={{ color: "rgba(30,58,74,0.5)" }}>{fmtDate(entry.date)}</span>
+            <span className="text-sm" style={{ color: "rgba(30,58,74,0.5)" }}>{fmtDate(entry.date)}</span>
             {entry.taxDeductible && (
-              <span className="text-xs" style={{ color: "#D4684A" }}>· ⊛ tax deductible</span>
+              <span className="text-sm" style={{ color: "#D4684A" }}>· ⊛ tax deductible</span>
             )}
           </div>
         </button>
@@ -96,7 +96,7 @@ export function EntryRow({ entry, color, onEdit }: Props) {
       {expanded && hasDetail && (
         <div className="mt-2 pt-2 space-y-2" style={{ borderTop: "1px solid #E2D9CC" }}>
           {entry.notes && (
-            <p className="text-xs" style={{ color: "rgba(30,58,74,0.6)" }}>{entry.notes}</p>
+            <p className="text-sm" style={{ color: "rgba(30,58,74,0.6)" }}>{entry.notes}</p>
           )}
           {allAttachments.length > 0 && (
             <div className="flex flex-col gap-1">
@@ -106,7 +106,7 @@ export function EntryRow({ entry, color, onEdit }: Props) {
                   href={`/api/blob-download?url=${encodeURIComponent(a.blobUrl)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs transition-colors"
+                  className="flex items-center gap-1.5 text-sm transition-colors"
                   style={{ color: "#3D8070" }}
                 >
                   <Paperclip size={11} />

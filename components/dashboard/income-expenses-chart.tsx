@@ -84,7 +84,7 @@ export function IncomeExpensesChart({ entries }: Props) {
         className="bg-white border rounded-xl p-6"
         style={{ borderColor: "#E2D9CC" }}
       >
-        <div className="text-[10px] uppercase tracking-widest font-bold mb-4" style={{ color: "rgba(30,58,74,0.5)" }}>
+        <div className="text-xs uppercase tracking-widest font-bold mb-4" style={{ color: "rgba(30,58,74,0.5)" }}>
           Monthly income vs expenses
         </div>
         <p className="text-sm text-center py-8" style={{ color: "rgba(30,58,74,0.4)" }}>
@@ -99,7 +99,7 @@ export function IncomeExpensesChart({ entries }: Props) {
       className="bg-white border rounded-xl p-5 sm:p-6"
       style={{ borderColor: "#E2D9CC" }}
     >
-      <div className="text-[10px] uppercase tracking-widest font-bold mb-5" style={{ color: "rgba(30,58,74,0.5)" }}>
+      <div className="text-xs uppercase tracking-widest font-bold mb-5" style={{ color: "rgba(30,58,74,0.5)" }}>
         Monthly income vs expenses
       </div>
 
