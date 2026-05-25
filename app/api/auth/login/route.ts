@@ -3,7 +3,10 @@ import { makeAuthCookie } from "@/lib/auth";
 
 export async function POST(request: Request) {
   const { password } = await request.json();
-  if (password !== process.env.APP_PASSWORD) {
+  const valid =
+    password === process.env.APP_PASSWORD ||
+    (process.env.GUEST_PASSWORD && password === process.env.GUEST_PASSWORD);
+  if (!valid) {
     return NextResponse.json({ error: "Wrong password" }, { status: 401 });
   }
   return NextResponse.json({ ok: true }, {
